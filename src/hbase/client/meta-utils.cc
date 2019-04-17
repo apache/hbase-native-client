@@ -66,7 +66,7 @@ std::unique_ptr<Request> MetaUtil::MetaRequest(const TableName tn, const std::st
 
   // Set the region this scan goes to
   auto region = msg->mutable_region();
-  region->set_value(MetaUtil::kMetaRegion);
+  region->set_value(MetaUtil::kMetaRegionName);
   region->set_type(
       RegionSpecifier_RegionSpecifierType::RegionSpecifier_RegionSpecifierType_ENCODED_REGION_NAME);
 

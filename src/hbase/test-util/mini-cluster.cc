@@ -34,7 +34,7 @@ JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
   char *classpath = getenv("CLASSPATH");
   std::string clspath;
   if (classpath == NULL || strstr(classpath, "-tests.jar") == NULL) {
-    std::string clsPathFilePath("../target/cached_classpath.txt");
+    std::string clsPathFilePath("../../../hbase-build-configuration/target/cached_classpath.txt");
     std::ifstream fd(clsPathFilePath);
     std::string prefix("");
     if (fd.is_open()) {
@@ -58,6 +58,8 @@ JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
       exit(-1);
     }
     fd.close();
+  } else {
+    clspath.assign(classpath, strlen(classpath));
   }
 
   auto options = std::string{"-Djava.class.path="} + clspath;
