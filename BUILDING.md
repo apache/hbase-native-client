@@ -41,14 +41,17 @@ However none of them is a must.
 
 # Building using docker
 
+Go into the hbase-native-client directory and run `./bin/start-docker.sh`
+that will build the docker development environment and when complete will
+drop you into a shell on a linux vm with all the dependencies needed installed.
+
 To start with make sure that you have built the java project using
 `mvn package -DskipTests`. That will allow all tests to spin up a standalone
 hbase instance from the jar's created.
 
-Then go into the hbase-native-client directory and run `./bin/start-docker.sh`
-that will build the docker development environment and when complete will
-drop you into a shell on a linux vm with all the dependencies needed installed.
-
+*Note*: you can run the HBase Maven build outside of docker but the cached
+classpath used by the unit tests may not reflect the paths from within the
+docker container.
 
 # CMake
 
@@ -57,3 +60,9 @@ cmake .
 make
 make install
 ```
+
+# Running tests
+
+To run the tests, you can use `make test` or run each compiled test individually
+as they are built in the top level directory of the module. For example from the
+hbase-native-client directory you can execute `./client-test`.

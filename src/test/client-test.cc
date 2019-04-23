@@ -47,6 +47,10 @@ using hbase::Table;
 using hbase::TestUtil;
 
 class ClientTest : public ::testing::Test {
+ protected:
+  ~ClientTest() override {
+    unsetenv("HBASE_CONF");
+  }
  public:
   static const constexpr char *kDefHBaseConfPath = "./build/test-data/client-test/conf/";
   static const constexpr char *kHBaseDefaultXml = "hbase-default.xml";

@@ -307,7 +307,7 @@ TEST(Result, ResultEstimatedSize) {
   std::vector<std::shared_ptr<Cell> > cells;
   Result empty(cells, true, false, false);
 
-  EXPECT_EQ(empty.EstimatedSize(), sizeof(Result));
+  EXPECT_EQ(empty.EstimatedSize(), sizeof(Result) + empty.Row().capacity());
 
   cells.push_back(std::make_shared<Cell>("a", "a", "", timestamp, "", cell_type));
   Result result1(cells, true, false, false);

@@ -186,10 +186,10 @@ TEST(CellTest, CellEstimatedSize) {
   LOG(INFO) << cell1.EstimatedSize();
 
   EXPECT_TRUE(empty.EstimatedSize() > sizeof(Cell));
-  EXPECT_TRUE(cell1.EstimatedSize() > empty.EstimatedSize());
+  EXPECT_TRUE(cell1.EstimatedSize() >= empty.EstimatedSize());
   EXPECT_EQ(cell1.EstimatedSize(), cell2.EstimatedSize());
   EXPECT_EQ(cell2.EstimatedSize(), cell3.EstimatedSize());
   EXPECT_EQ(cell3.EstimatedSize(), cell4.EstimatedSize());
   EXPECT_EQ(cell4.EstimatedSize(), cell5.EstimatedSize());
-  EXPECT_TRUE(cell6.EstimatedSize() > cell1.EstimatedSize());
+  EXPECT_TRUE(cell6.EstimatedSize() >= cell1.EstimatedSize());
 }
