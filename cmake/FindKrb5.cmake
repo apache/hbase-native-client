@@ -19,10 +19,16 @@
 find_path(KRB5_ROOT_DIR
     NAMES include/krb5/krb5.h
 )
+find_library(GSSAPI_KRB5_LIBRARY gssapi_krb5)
+
 find_library(KRB5_LIBRARIES
     NAMES krb5
     HINTS ${KRB5_ROOT_DIR}/lib
 )
+
+
+find_library(GSSAPI_KRB5_LIBRARY gssapi_krb5)
+
 find_path(KRB5_INCLUDE_DIR
     NAMES krb5/krb5.h
     HINTS ${KRB5_ROOT_DIR}/include
@@ -32,9 +38,10 @@ find_package_handle_standard_args(krb5 DEFAULT_MSG
     KRB5_LIBRARIES
     KRB5_INCLUDE_DIR
 )
+set(KRB5_LIBRARIES "${KRB5_LIBRARIES}" "${GSSAPI_KRB5_LIBRARY}")
 if (KRB5_LIBRARIES)
    set(KRB5_FOUND "true")
-   message("-- KRB5 Libs Found, ${KRB5_LIBRARIES}")
+   message(STATUS "KRB5 Libs Found, ${KRB5_LIBRARIES}")
 endif()
 mark_as_advanced(
     KRB5_ROOT_DIR

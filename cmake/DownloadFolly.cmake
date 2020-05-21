@@ -17,32 +17,25 @@
 
 ## Download facebook's folly library. 
 ## SOURCE_DIR is typically the cmake source directory
-## BUILD_DIR is the build directory, typically 'build'
-
 function(download_folly SOURCE_DIR BUILD_DIR)
-   
-  if (DOWNLOAD_DEPENDENCIES)
-    # Add custom boost include and lib paths.
-    set(CFLAGS "-fPIC -I${BOOST_ROOT}/include -lboost_context -lboost_coroutine -l${CMAKE_DL_LIBS}")
-    set(CXXFLAGS "${CMAKE_CXX_FLAGS} -fPIC -I${BOOST_ROOT}/include -lboost_context -lboost_coroutine -l${CMAKE_DL_LIBS}")
-    set(LDFLAGS "-L${BOOST_ROOT}/lib")
-    set(CONFIGURE_CMD ./configure --prefix=${BUILD_DIR}/dependencies/facebook-folly-proj-install
-      --with-boost-libdir=${BOOST_ROOT}/lib CFLAGS=${CFLAGS} CXXFLAGS=${CXXFLAGS} LDFLAGS=${LDFLAGS})
-  else()
-    set(CFLAGS "-fPIC -lboost_context -lboost_coroutine -l${CMAKE_DL_LIBS}")
-    set(CXXFLAGS "${CMAKE_CXX_FLAGS} -fPIC -lboost_context -lboost_coroutine -l${CMAKE_DL_LIBS}")
-    set(CONFIGURE_CMD ./configure --prefix=${BUILD_DIR}/dependencies/facebook-folly-proj-install CFLAGS=${CFLAGS} CXXFLAGS=${CXXFLAGS})
-  endif()
 
   ExternalProject_Add(
-      facebook-folly-proj
-      # TODO: Source version information from cmake file.
-      URL "https://github.com/facebook/folly/archive/v2017.09.04.00.tar.gz"
-      PREFIX "${BUILD_DIR}/dependencies"
-      SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"
-      BINARY_DIR ${BUILD_DIR}/dependencies/facebook-folly-proj-src/folly
-      CONFIGURE_COMMAND autoreconf -ivf COMMAND ${CONFIGURE_CMD}
-      UPDATE_COMMAND ""
+    facebook-folly-proj
+    GIT_REPOSITORY "https://github.com/facebook/folly.git"
+    GIT_TAG "v2020.05.18.00"
+    SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy
+      		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
+    CMAKE_ARGS ${PASSTHROUGH_CMAKE_ARGS}
+		  "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/facebook-folly-proj-install"
+			-DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR}
+      -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX}
+      -DBYPRODUCT_SUFFIX=${BYPRODUCT_SUFFIX}
+      -DBOOST_ROOT=${BOOST_ROOT}
+      -DBOOST_INCLUDEDIR=${BOOST_ROOT}/include
+      -DBOOST_LIBRARYDIR=${BOOST_ROOT}/lib
+			"${BUILD_ARGS}"
   )
   set(FOLLY_ROOT_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-install" CACHE STRING "" FORCE)
 endfunction(download_folly) 

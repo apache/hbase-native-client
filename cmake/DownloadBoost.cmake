@@ -49,4 +49,5 @@ function(download_boost SOURCE_DIR BUILD_DIR BOOST_LIBS)
      INSTALL_COMMAND ""
   )
   set(BOOST_ROOT ${BOOST_INSTALL_DIR} PARENT_SCOPE)
+  set(Boost_FIND_COMPONENTS ${BOOST_LIBS} PARENT_SCOPE)
 endfunction(download_boost) 

@@ -17,7 +17,7 @@
  *
  */
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <gmock/gmock.h>
 
 #include "hbase/connection/connection-factory.h"

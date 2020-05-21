@@ -18,8 +18,7 @@
  */
 
 #pragma once
-
-#include <boost/optional.hpp>
+#include <optional>
 #include <boost/none.hpp>
 
 namespace hbase {
@@ -28,7 +27,7 @@ namespace hbase {
  * An optional value that may or may not be present.
  */
 template <class T>
-using optional = boost::optional<T>;
+using optional = std::optional<T>;
 
 const boost::none_t none = boost::none;
 

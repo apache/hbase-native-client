@@ -70,7 +70,8 @@ AsyncBatchRpcRetryingCaller<REQ, RESP>::~AsyncBatchRpcRetryingCaller() {}
 template <typename REQ, typename RESP>
 Future<std::vector<Try<RESP>>> AsyncBatchRpcRetryingCaller<REQ, RESP>::Call() {
   GroupAndSend(actions_, 1);
-  return collectAll(action2futures_);
+  // use the executor to convert he SemiFuture to a Future.
+  return std::move(collectAll(action2futures_)).via(cpu_pool_.get());
 }
 
 template <typename REQ, typename RESP>
@@ -239,7 +240,7 @@ AsyncBatchRpcRetryingCaller<REQ, RESP>::GetRegionLocations(
                                                  RegionLocateType::kCurrent, locate_timeout_ns));
   }
 
-  return collectAll(locs);
+  return std::move(collectAll(locs)).via(cpu_pool_.get());
 }
 
 template <typename REQ, typename RESP>
@@ -257,7 +258,7 @@ void AsyncBatchRpcRetryingCaller<REQ, RESP>::GroupAndSend(
   }
 
   GetRegionLocations(actions, locate_timeout_ns)
-      .then([=](std::vector<Try<std::shared_ptr<RegionLocation>>> &loc) {
+      .thenValue([&](std::vector<Try<std::shared_ptr<RegionLocation>>> loc) {
         std::lock_guard<std::recursive_mutex> lck(multi_mutex_);
         ActionsByServer actions_by_server;
         std::vector<std::shared_ptr<Action>> locate_failed;
@@ -305,7 +306,7 @@ void AsyncBatchRpcRetryingCaller<REQ, RESP>::GroupAndSend(
           TryResubmit(locate_failed, tries);
         }
       })
-      .onError([=](const folly::exception_wrapper &ew) {
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[&](const folly::exception_wrapper &ew) {
         VLOG(1) << "GetRegionLocations() exception: " << ew.what().toStdString()
                 << "tries: " << tries << "; max_attempts_: " << max_attempts_;
         std::lock_guard<std::recursive_mutex> lck(multi_mutex_);
@@ -331,7 +332,7 @@ AsyncBatchRpcRetryingCaller<REQ, RESP>::GetMultiResponse(const ActionsByServer &
     multi_calls.push_back(
         rpc_client_->AsyncCall(host, port, std::move(multi_req), user, "ClientService"));
   }
-  return collectAll(multi_calls);
+  return std::move(collectAll(multi_calls)).via(cpu_pool_.get());
 }
 
 template <typename REQ, typename RESP>
@@ -362,7 +363,7 @@ void AsyncBatchRpcRetryingCaller<REQ, RESP>::Send(const ActionsByServer &actions
         std::move(RequestConverter::ToMultiRequest(action_by_server.second->actions_by_region())));
 
   GetMultiResponse(actions_by_server)
-      .then([=](const std::vector<Try<std::unique_ptr<hbase::Response>>> &completed_responses) {
+      .thenValue([&](const std::vector<Try<std::unique_ptr<hbase::Response>>> &completed_responses) {
         std::lock_guard<std::recursive_mutex> lck(multi_mutex_);
         uint64_t num = 0;
         for (const auto &action_by_server : actions_by_server) {
@@ -382,7 +383,7 @@ void AsyncBatchRpcRetryingCaller<REQ, RESP>::Send(const ActionsByServer &actions
           num++;
         }
       })
-      .onError([=](const folly::exception_wrapper &ew) {
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[&](const folly::exception_wrapper &ew) {
         VLOG(1) << "GetMultiResponse() exception: " << ew.what().toStdString();
         std::lock_guard<std::recursive_mutex> lck(multi_mutex_);
         for (const auto &action_by_server : actions_by_server) {

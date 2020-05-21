@@ -28,8 +28,6 @@
 
 namespace hbase {
 
-template <class T>
-using optional = boost::optional<T>;
 
 class Configuration {
  public:
@@ -160,44 +158,44 @@ class Configuration {
    * SubstituteVars will be called for any variable expansion.
    * @param key Key whose value is to be fetched.
    */
-  optional<std::string> Get(const std::string &key) const;
+  std::optional<std::string> Get(const std::string &key) const;
 
   /**
-   * @brief returns optional int32_t value identified by the key in ConfigMap.
+   * @brief returns std::optional int32_t value identified by the key in ConfigMap.
    * Get(key) is called to get the string value which is then converted to
    * int32_t using boost::lexical_cast.
    * @param key Key whose value is to be fetched.
    * @throws std::runtime_error if conversion to int32_t fails
    */
-  optional<int32_t> GetInt(const std::string &key) const;
+  std::optional<int32_t> GetInt(const std::string &key) const;
 
   /**
-   * @brief returns optional int64_t value identified by the key in ConfigMap.
+   * @brief returns std::optional int64_t value identified by the key in ConfigMap.
    * Get(key) is called internally to get the string value which is then
    * converted to int64_t using boost::lexical_cast.
    * @param key Key whose value is to be fetched.
    * @throws std::runtime_error if conversion to int64_t fails
    */
-  optional<int64_t> GetLong(const std::string &key) const;
+  std::optional<int64_t> GetLong(const std::string &key) const;
 
   /**
-   * @brief returns optional double value identified by the key in ConfigMap.
+   * @brief returns std::optional double value identified by the key in ConfigMap.
    * Get(key) is called to get the string value which is then converted to
    * double using boost::lexical_cast.
    * @param key Key whose value is to be fetched.
    * @throws std::runtime_error if conversion to double fails
    */
-  optional<double> GetDouble(const std::string &key) const;
+  std::optional<double> GetDouble(const std::string &key) const;
 
   /**
-   * @brief returns optional bool for a property identified by key in ConfigMap.
+   * @brief returns std::optional bool for a property identified by key in ConfigMap.
    * Get(key) is called to get the string value which is then converted to bool
    * by checking the validity.
    * @param key Key whose value is to be fetched. Get(key) is called to get the
    * string value which is then converted to bool.
    * @throws std::runtime_error if conversion to bool fails
    */
-  optional<bool> GetBool(const std::string &key) const;
+  std::optional<bool> GetBool(const std::string &key) const;
 
   /**
    * @brief This method will perform any variable expansion if present.
@@ -221,12 +219,12 @@ class Configuration {
    * @brief This method will fetch value for key from environment if present.
    * @param key key to be fetched from environment.
    */
-  optional<std::string> GetEnv(const std::string &key) const;
+  std::optional<std::string> GetEnv(const std::string &key) const;
 
   /**
    * @brief This method will fetch value for key from ConfigMap if present.
    * @param key key to be fetched from environment.
    */
-  optional<std::string> GetProperty(const std::string &key) const;
+  std::optional<std::string> GetProperty(const std::string &key) const;
 };
 } /* namespace hbase */

@@ -53,7 +53,7 @@ folly::Future<RESP> RawAsyncTable::Call(
   return rpc_client
       ->AsyncCall(loc->server_name().host_name(), loc->server_name().port(), std::move(preq),
                   User::defaultUser(), "ClientService")
-      .then(
+      .thenValue(
           [resp_converter](const std::unique_ptr<PRESP>& presp) { return resp_converter(*presp); });
 }
 
@@ -76,7 +76,7 @@ folly::Future<std::shared_ptr<Result>> RawAsyncTable::Get(const hbase::Get& get)
   // context and get deallocated since the caller injects a lot of closures which capture [this, &]
   // which is use-after-free. We are just passing an identity closure capturing caller by value to
   // ensure  that the lifecycle of the Caller object is longer than the retry lambdas.
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 folly::Future<std::shared_ptr<Result>> RawAsyncTable::Increment(const hbase::Increment& incr) {
   auto caller =
@@ -93,7 +93,7 @@ folly::Future<std::shared_ptr<Result>> RawAsyncTable::Increment(const hbase::Inc
           })
           ->Build();
 
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 
 folly::Future<folly::Unit> RawAsyncTable::Put(const hbase::Put& put) {
@@ -109,7 +109,7 @@ folly::Future<folly::Unit> RawAsyncTable::Put(const hbase::Put& put) {
           })
           ->Build();
 
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 
 folly::Future<bool> RawAsyncTable::CheckAndPut(const std::string& row, const std::string& family,
@@ -135,7 +135,7 @@ folly::Future<bool> RawAsyncTable::CheckAndPut(const std::string& row, const std
           })
           ->Build();
 
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 
 folly::Future<bool> RawAsyncTable::CheckAndDelete(const std::string& row, const std::string& family,
@@ -162,7 +162,7 @@ folly::Future<bool> RawAsyncTable::CheckAndDelete(const std::string& row, const 
           })
           ->Build();
 
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 
 folly::Future<folly::Unit> RawAsyncTable::Delete(const hbase::Delete& del) {
@@ -178,7 +178,7 @@ folly::Future<folly::Unit> RawAsyncTable::Delete(const hbase::Delete& del) {
           })
           ->Build();
 
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 
 folly::Future<std::shared_ptr<Result>> RawAsyncTable::Append(const hbase::Append& append) {
@@ -196,7 +196,7 @@ folly::Future<std::shared_ptr<Result>> RawAsyncTable::Append(const hbase::Append
           })
           ->Build();
 
-  return caller->Call().then([caller](const auto r) { return r; });
+  return caller->Call().thenValue([caller](const auto r) { return r; });
 }
 
 folly::Future<std::vector<folly::Try<std::shared_ptr<Result>>>> RawAsyncTable::Get(
@@ -224,7 +224,7 @@ folly::Future<std::vector<folly::Try<RESP>>> RawAsyncTable::Batch(
                     ->start_log_errors_count(connection_conf_->start_log_errors_count())
                     ->Build();
 
-  return caller->Call().then([caller](auto r) { return r; });
+  return caller->Call().thenValue([caller](auto r) { return r; });
 }
 
 void RawAsyncTable::Scan(const hbase::Scan& scan, std::shared_ptr<RawScanResultConsumer> consumer) {
