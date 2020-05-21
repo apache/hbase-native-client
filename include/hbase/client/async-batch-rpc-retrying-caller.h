@@ -26,7 +26,7 @@
 #include <folly/futures/Promise.h>
 #include <folly/io/IOBuf.h>
 #include <folly/io/async/HHWheelTimer.h>
-#include <wangle/concurrent/CPUThreadPoolExecutor.h>
+#include <folly/executors/CPUThreadPoolExecutor.h>
 
 #include <algorithm>
 #include <chrono>
@@ -178,7 +178,7 @@ class AsyncBatchRpcRetryingCaller {
 
   std::shared_ptr<AsyncRegionLocator> location_cache_ = nullptr;
   std::shared_ptr<RpcClient> rpc_client_ = nullptr;
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_pool_ = nullptr;
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_pool_ = nullptr;
 
   std::recursive_mutex multi_mutex_;
 };

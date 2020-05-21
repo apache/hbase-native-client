@@ -23,8 +23,8 @@
 #include <folly/SharedMutex.h>
 #include <folly/futures/Future.h>
 #include <folly/futures/SharedPromise.h>
-#include <wangle/concurrent/CPUThreadPoolExecutor.h>
-#include <wangle/concurrent/IOThreadPoolExecutor.h>
+#include <folly/executors/CPUThreadPoolExecutor.h>
+#include <folly/executors/IOThreadPoolExecutor.h>
 #include <zookeeper/zookeeper.h>
 
 #include <map>
@@ -88,8 +88,8 @@ class LocationCache : public AsyncRegionLocator {
    * @param io_executor executor used to talk to the network
    */
   LocationCache(std::shared_ptr<hbase::Configuration> conf,
-                std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+                std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                 std::shared_ptr<ConnectionPool> cp);
   /**
    * Destructor.
@@ -202,8 +202,8 @@ class LocationCache : public AsyncRegionLocator {
   /* data */
   std::shared_ptr<hbase::Configuration> conf_;
   std::string zk_quorum_;
-  std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor_;
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor_;
+  std::shared_ptr<folly::IOThreadPoolExecutor> io_executor_;
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor_;
   std::shared_ptr<folly::SharedPromise<hbase::pb::ServerName>> meta_promise_;
   std::recursive_mutex meta_lock_;
   MetaUtil meta_util_;

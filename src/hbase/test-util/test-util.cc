@@ -18,6 +18,7 @@
  */
 
 #include "hbase/test-util/test-util.h"
+#include <folly/GLog.h>
 #include <string.h>
 
 #include <folly/Format.h>

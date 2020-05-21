@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <wangle/service/ClientDispatcher.h>
 
 #include <atomic>

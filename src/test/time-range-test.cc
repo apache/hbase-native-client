@@ -19,7 +19,7 @@
 
 #include "hbase/client/time-range.h"
 
-#include <glog/logging.h>
+#include <folly/GLog.h>
 #include <gtest/gtest.h>
 
 using namespace hbase;

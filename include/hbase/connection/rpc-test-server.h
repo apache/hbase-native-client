@@ -18,7 +18,7 @@
  */
 #pragma once
 #include <folly/SocketAddress.h>
-#include <wangle/concurrent/CPUThreadPoolExecutor.h>
+#include <folly/executors/CPUThreadPoolExecutor.h>
 #include <wangle/service/ExecutorFilter.h>
 #include <wangle/service/Service.h>
 

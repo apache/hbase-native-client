@@ -17,7 +17,7 @@
  *
  */
 
-#include <folly/Logging.h>
+#include <folly/GLog.h>
 #include <gtest/gtest.h>
 #include <string>
 

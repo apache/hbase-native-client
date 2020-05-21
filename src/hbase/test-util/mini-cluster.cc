@@ -34,7 +34,7 @@ JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
   char *classpath = getenv("CLASSPATH");
   std::string clspath;
   if (classpath == NULL || strstr(classpath, "-tests.jar") == NULL) {
-    std::string clsPathFilePath("../../../hbase-build-configuration/target/cached_classpath.txt");
+    std::string clsPathFilePath("../target/cached_classpath.txt");
     std::ifstream fd(clsPathFilePath);
     std::string prefix("");
     if (fd.is_open()) {
@@ -58,8 +58,6 @@ JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
       exit(-1);
     }
     fd.close();
-  } else {
-    clspath.assign(classpath, strlen(classpath));
   }
 
   auto options = std::string{"-Djava.class.path="} + clspath;
@@ -126,12 +124,20 @@ void MiniCluster::Setup() {
         env_->GetMethodID(testing_util_class_, "createTable",
                           "(Lorg/apache/hadoop/hbase/TableName;Ljava/lang/String;)Lorg/"
                           "apache/hadoop/hbase/client/Table;");
+    if (create_table_mid_ == NULL) {
+      LOG(INFO) << "Couldn't find method createTable";
+      exit(-1);
+    }
     create_table_families_mid_ = env_->GetMethodID(testing_util_class_, "createTable",
                                                    "(Lorg/apache/hadoop/hbase/TableName;[[B)Lorg/"
-                                                   "apache/hadoop/hbase/client/Table;");
+                                                   "apache/hadoop/hbase/client/HTable;");
+    if (create_table_families_mid_ == NULL) {
+      LOG(INFO) << "Couldn't find method createTable with families";
+      exit(-1);
+    }
     create_table_with_split_mid_ = env_->GetMethodID(
         testing_util_class_, "createTable",
-        "(Lorg/apache/hadoop/hbase/TableName;[[B[[B)Lorg/apache/hadoop/hbase/client/Table;");
+        "(Lorg/apache/hadoop/hbase/TableName;[[B[[B)Lorg/apache/hadoop/hbase/client/HTable;");
     if (create_table_with_split_mid_ == NULL) {
       LOG(INFO) << "Couldn't find method createTable with split";
       exit(-1);
@@ -251,7 +257,6 @@ jobject MiniCluster::CreateTable(const std::string &table, const std::vector<std
   for (auto key : keys) {
     env_->SetObjectArrayElement(key_array, i++, StrToByteChar(key));
   }
-
   jobject tbl = env_->CallObjectMethod(htu_, create_table_with_split_mid_, table_name, family_array,
                                        key_array);
   return tbl;

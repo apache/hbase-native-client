@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <algorithm>
 #include <chrono>
 #include <iterator>

@@ -1,0 +1,15 @@
+Apache HBase
+Copyright 2019 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+This includes the following derived works from https://github.com/Crascit/DownloadProject ,
+which is distributed under an MIT license.
+	DownloadProject.cmake
+	DownlaodProjects.CmakeLists.autogen.in
+	DownlaodProjects.CmakeLists.cmake.in
+
+This includes the following derived works from https://github.com/facebook/folly for details,
+which is distributed under an MIT license.
+	DownloadDoubleConversion.cmake

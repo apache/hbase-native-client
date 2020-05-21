@@ -19,7 +19,7 @@
 
 #include "hbase/serde/zk.h"
 
-#include <folly/Logging.h>
+#include <folly/GLog.h>
 #include <folly/io/Cursor.h>
 #include <folly/io/IOBuf.h>
 #include <gtest/gtest.h>
