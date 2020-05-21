@@ -1,0 +1,4 @@
+559c559
+<         strncpy(cmd, argv[2]+4, sizeof(cmd));
+---
+>         strncpy(cmd, argv[2]+4, sizeof(cmd)-1);

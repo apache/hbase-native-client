@@ -23,9 +23,9 @@
 #include <stdexcept>
 #include <utility>
 
+#include <glog/logging.h>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include <glog/logging.h>
 
 namespace hbase {
 
@@ -89,28 +89,28 @@ std::string Configuration::SubstituteVars(const std::string &expr) const {
   }
 }
 
-optional<std::string> Configuration::GetEnv(const std::string &key) const {
+std::optional<std::string> Configuration::GetEnv(const std::string &key) const {
   char buf[2048];
 
   if ("user.name" == key) {
 #ifdef HAVE_GETLOGIN
-    return getlogin();
+    return std::make_optional(getlogin());
 #else
     DLOG(WARNING) << "Client user.name not implemented";
-    return none;
+    return std::optional<std::string>();
 #endif
   }
 
   if ("user.dir" == key) {
 #ifdef HAVE_GETCWD
     if (getcwd(buf, sizeof(buf))) {
-      return buf;
+      return std::make_optional(buf);
     } else {
-      return none;
+      return std::optional<std::string>();
     }
 #else
     DLOG(WARNING) << "Client user.dir not implemented";
-    return none;
+    return std::optional<std::string>();
 #endif
   }
 
@@ -118,33 +118,33 @@ optional<std::string> Configuration::GetEnv(const std::string &key) const {
 #if defined(HAVE_GETUID) && defined(HAVE_GETPWUID_R)
     uid = getuid();
     if (!getpwuid_r(uid, &pw, buf, sizeof(buf), &pwp)) {
-      return buf;
+      return std::make_optional(buf);
     } else {
-      return none;
+      return std::optional<std::string>();
     }
 #else
     DLOG(WARNING) << "Client user.home not implemented";
-    return none;
+    return std::optional<std::string>();
 #endif
   }
-  return none;
+  return std::optional<std::string>();
 }
 
-optional<std::string> Configuration::GetProperty(const std::string &key) const {
+std::optional<std::string> Configuration::GetProperty(const std::string &key) const {
   auto found = hb_property_.find(key);
   if (found != hb_property_.end()) {
-    return found->second.value;
+    return std::make_optional(found->second.value);
   } else {
-    return none;
+    return std::optional<std::string>();
   }
 }
 
-optional<std::string> Configuration::Get(const std::string &key) const {
-  optional<std::string> raw = GetProperty(key);
+std::optional<std::string> Configuration::Get(const std::string &key) const {
+  std::optional<std::string> raw = GetProperty(key);
   if (raw) {
-    return SubstituteVars(*raw);
+    return std::make_optional(SubstituteVars(*raw));
   } else {
-    return none;
+    return std::optional<std::string>();
   }
 }
 
@@ -152,61 +152,61 @@ std::string Configuration::Get(const std::string &key, const std::string &defaul
   return Get(key).value_or(default_value);
 }
 
-optional<int32_t> Configuration::GetInt(const std::string &key) const {
-  optional<std::string> raw = Get(key);
+std::optional<int32_t> Configuration::GetInt(const std::string &key) const {
+  std::optional<std::string> raw = Get(key);
   if (raw) {
     try {
-      return boost::lexical_cast<int32_t>(*raw);
+      return std::make_optional(boost::lexical_cast<int32_t>(*raw));
     } catch (const boost::bad_lexical_cast &blex) {
       throw std::runtime_error(blex.what());
     }
   }
-  return none;
+  return std::optional<int32_t>();
 }
 
 int32_t Configuration::GetInt(const std::string &key, int32_t default_value) const {
   return GetInt(key).value_or(default_value);
 }
 
-optional<int64_t> Configuration::GetLong(const std::string &key) const {
-  optional<std::string> raw = Get(key);
+std::optional<int64_t> Configuration::GetLong(const std::string &key) const {
+  std::optional<std::string> raw = Get(key);
   if (raw) {
     try {
-      return boost::lexical_cast<int64_t>(*raw);
+      return std::make_optional(boost::lexical_cast<int64_t>(*raw));
     } catch (const boost::bad_lexical_cast &blex) {
       throw std::runtime_error(blex.what());
     }
   }
-  return none;
+  return std::optional<int64_t>();
 }
 
 int64_t Configuration::GetLong(const std::string &key, int64_t default_value) const {
   return GetLong(key).value_or(default_value);
 }
 
-optional<double> Configuration::GetDouble(const std::string &key) const {
-  optional<std::string> raw = Get(key);
+std::optional<double> Configuration::GetDouble(const std::string &key) const {
+  std::optional<std::string> raw = Get(key);
   if (raw) {
     try {
-      return boost::lexical_cast<double>(*raw);
+      return std::make_optional(boost::lexical_cast<double>(*raw));
     } catch (const boost::bad_lexical_cast &blex) {
       throw std::runtime_error(blex.what());
     }
   }
-  return none;
+  return std::optional<double>();
 }
 
 double Configuration::GetDouble(const std::string &key, double default_value) const {
   return GetDouble(key).value_or(default_value);
 }
 
-optional<bool> Configuration::GetBool(const std::string &key) const {
-  optional<std::string> raw = Get(key);
+std::optional<bool> Configuration::GetBool(const std::string &key) const {
+  std::optional<std::string> raw = Get(key);
   if (raw) {
     if (!strcasecmp((*raw).c_str(), "true") || !strcasecmp((*raw).c_str(), "1")) {
-      return true;
+      return std::make_optional(true);
     } else if (!strcasecmp((*raw).c_str(), "false") || !strcasecmp((*raw).c_str(), "0")) {
-      return false;
+      return std::make_optional(false);
     } else {
       boost::format what("Unexpected value \"%s\" found being converted to bool for key \"%s\"");
       what % (*raw);
@@ -214,7 +214,7 @@ optional<bool> Configuration::GetBool(const std::string &key) const {
       throw std::runtime_error(what.str());
     }
   }
-  return none;
+  return std::optional<bool>();
 }
 
 bool Configuration::GetBool(const std::string &key, bool default_value) const {

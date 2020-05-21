@@ -65,6 +65,8 @@ Future<std::unique_ptr<Response>> RpcTestService::operator()(std::unique_ptr<Req
   response->set_call_id(request->call_id());
   std::string method_name = request->method();
 
+  std::cout << "received " << method_name << std::endl;
+
   if (method_name == "ping") {
     auto pb_resp_msg = std::make_shared<EmptyResponseProto>();
     response->set_resp_msg(pb_resp_msg);

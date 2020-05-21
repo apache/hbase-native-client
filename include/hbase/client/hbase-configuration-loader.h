@@ -132,7 +132,7 @@ class HBaseConfigurationLoader {
    * @param final_text value of final node true or false if present
    */
   bool UpdateMapWithValue(ConfigMap &map, const std::string &key, const std::string &value,
-                          boost::optional<std::string> final_text);
+                          std::optional<std::string> final_text);
 };
 
 } /* namespace hbase */

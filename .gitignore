@@ -3,6 +3,9 @@
 *.lo
 *.o
 
+# Proto files
+src/hbase/if/*.proto
+
 # Compiled Dynamic libraries
 *.so
 
