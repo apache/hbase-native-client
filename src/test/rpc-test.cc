@@ -108,8 +108,9 @@ TEST_F(RpcTest, Ping) {
                                            std::make_shared<EmptyResponseProto>(), method);
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
       .thenValue([&](std::unique_ptr<Response> response) {
         auto pb_resp = std::static_pointer_cast<EmptyResponseProto>(response->resp_msg());
@@ -142,8 +143,9 @@ TEST_F(RpcTest, Echo) {
   pb_msg->set_message(greetings);
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
       .thenValue([&](std::unique_ptr<Response> response) {
         auto pb_resp = std::static_pointer_cast<EchoResponseProto>(response->resp_msg());
@@ -173,8 +175,9 @@ TEST_F(RpcTest, Error) {
   auto request = std::make_unique<Request>(std::make_shared<EmptyRequestProto>(),
                                            std::make_shared<EmptyResponseProto>(), method);
   /* sending out request */
+auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
       .thenValue([&](std::unique_ptr<Response> response) {
         FAIL() << folly::sformat(FLAGS_fail_ex_format, method);
@@ -214,8 +217,9 @@ TEST_F(RpcTest, SocketNotOpen) {
   server->join();
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
       .thenValue([&](std::unique_ptr<Response> response) {
         FAIL() << folly::sformat(FLAGS_fail_ex_format, method);
@@ -265,8 +269,9 @@ TEST_F(RpcTest, Pause) {
   pb_msg->set_ms(ms);
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
       .thenValue([&](std::unique_ptr<Response> response) {
         auto pb_resp = std::static_pointer_cast<EmptyResponseProto>(response->resp_msg());

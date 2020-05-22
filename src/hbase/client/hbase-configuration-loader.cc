@@ -175,7 +175,10 @@ bool HBaseConfigurationLoader::LoadProperties(const std::string &file, ConfigMap
         std::string value_node = v.second.get<std::string>("value");
         if ((name_node.size() > 0) && (value_node.size() > 0)) {
           auto final_node = v.second.get_optional<std::string>("final");
-          UpdateMapWithValue(property_map, name_node, value_node, std::make_optional(final_node.get()));
+          // since we're converting from boost::optional to std::optional we'll make a check
+          // as boost asserts initialization.
+          auto finalopt = final_node.is_initialized() ? std::make_optional(final_node.get()) : std::optional<std::string>();
+          UpdateMapWithValue(property_map, name_node, value_node, finalopt);
         }
       }
     }
