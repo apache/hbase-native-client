@@ -36,7 +36,7 @@ simple-client
 # CMake temporary files
 CMakeCache.txt
 CMakeFiles
-*.cmake
+#*.cmake
 Makefile
 
 # Copied from hbase-common at build-time

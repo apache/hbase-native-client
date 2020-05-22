@@ -48,16 +48,13 @@ function(createTests testName)
     target_include_directories(${testName} PRIVATE BEFORE "${GTEST_INCLUDE_DIRS}")
     target_include_directories(${testName} PRIVATE BEFORE "${OPENSSL_INCLUDE_DIR}")
 
-	#target_link_libraries(${testName} ${WANGLE_LIBRARIES})
-	#target_link_libraries(${testName} ${FIZZ_LIBRARIES})
-#	target_link_libraries(${testName} ${FOLLY_LIBRARIES})
-    target_link_libraries(${testName} ${PROTOBUF_LIBRARY})
-    
+	
+    #target_link_libraries(${testName} ${PROTOBUF_LIBRARY})
+    #${PROTOBUF_LIBRARY}
 
     target_link_libraries(${testName} hbaseclient-static testutil ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} 
     ${Java_LIBRARIES}
     ${JNI_LIBRARIES}
-    ${PROTOBUF_LIBRARY}
     ${Boost_LIBRARIES}
     ${GFLAGS_SHARED_LIB}
     ${GTEST_BOTH_LIBRARIES}
