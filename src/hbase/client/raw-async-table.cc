@@ -124,10 +124,10 @@ folly::Future<bool> RawAsyncTable::CheckAndPut(const std::string& row, const std
             return Call<hbase::Put, hbase::Request, hbase::Response, bool>(
                 rpc_client, controller, loc, put,
                 // request conversion
-                [=, &put](const hbase::Put& put,
+                [=, &put](const hbase::Put& pt,
                           const std::string& region_name) -> std::unique_ptr<Request> {
                   auto checkReq = RequestConverter::CheckAndPutToMutateRequest(
-                      row, family, qualifier, value, compare_op, put, region_name);
+                      row, family, qualifier, value, compare_op, pt, region_name);
                   return checkReq;
                 },
                 // response conversion
@@ -151,10 +151,10 @@ folly::Future<bool> RawAsyncTable::CheckAndDelete(const std::string& row, const 
             return Call<hbase::Delete, hbase::Request, hbase::Response, bool>(
                 rpc_client, controller, loc, del,
                 // request conversion
-                [=, &del](const hbase::Delete& del,
+                [=, &del](const hbase::Delete& dlt,
                           const std::string& region_name) -> std::unique_ptr<Request> {
                   auto checkReq = RequestConverter::CheckAndDeleteToMutateRequest(
-                      row, family, qualifier, value, compare_op, del, region_name);
+                      row, family, qualifier, value, compare_op, dlt, region_name);
                   return checkReq;
                 },
                 // response conversion

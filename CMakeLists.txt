@@ -25,15 +25,87 @@ set(PROJECT_VERSION_PATCH 0)
 set(BUILD_SHARED_LIBS ON)
 ## set our cmake module path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(CMakeDependentOption)
+include(CheckIncludeFile)
+include(ExternalProject)
+include(DownloadProject)
+include(CheckCXXCompilerFlag)
+
+
+option(BUILD_LOCAL_DEPENDENCIES "Downloads and builds all dependencies locally " OFF)
+option(HBASE_TARGET_TAG "Downloads and builds all dependencies locally " OFF)
+
+######### Includes
+
+	
+if (WIN32)
+	set(BYPRODUCT_SUFFIX ".lib" CACHE STRING "" FORCE)
+	set(BYPRODUCT_SHARED_SUFFIX ".lib" CACHE STRING "" FORCE)
+	set(BYPRODUCT_PREFIX "" CACHE STRING "" FORCE)
+	set(BUILD_ARGS " -GVisual Studio 15 2017")
+else()
+	set(BYPRODUCT_PREFIX "lib" CACHE STRING "" FORCE)
+	set(BYPRODUCT_SHARED_SUFFIX ".so" CACHE STRING "" FORCE)
+	set(BYPRODUCT_SUFFIX ".a" CACHE STRING "" FORCE)
+endif()
+	
+
+
 ## include the Protobuf generation code
 include(ProtobufGen)
-if(COMPILER_SUPPORTS_CXX14)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+include(DownloadFolly)
+include(DownloadWangle)
+include(DownloadZookeeper)
+
+if (BUILD_LOCAL_DEPENDENCIES)
+	## we want to find the system protoc
+	download_project(PROJ Protobuf
+				 IS_AUTOGEN
+				 GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+	  			 GIT_TAG "3.5.1.1")
+	  			 
+	set(PROTOBUF_DIR "${Protobuf_BINARY_DIR}" CACHE STRING "" FORCE)
+	
+	add_library(Protobuf STATIC IMPORTED)
+	set_target_properties(Protobuf PROPERTIES IMPORTED_LOCATION "${Protobuf_BINARY_DIR}/lib/libprotobuf.a" )
+	set(PROTOBUF_LIBS "${Protobuf_BINARY_DIR}/lib/libprotobuf.a" "${Protobuf_BINARY_DIR}/lib/libprotoc.a" CACHE STRING "" FORCE)
+	set(PROTOBUF_INCLUDE_DIRS "${Protobuf_BINARY_DIR}/include" CACHE STRING "" FORCE)
+	add_dependencies(Protobuf Protobuf-download)
+	set(PROTOBUF_FOUND TRUE CACHE STRING "" FORCE)
+	
+	set(PROTOBUF_PROTOC_EXECUTABLE "${Protobuf_BINARY_DIR}/bin/protoc" CACHE STRING "" FORCE)
+	## Add CMAKE_MODULE_PATHS
+	
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/zookeeper/local")
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/protobuf/local")
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local")
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/wangle/local")
 else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
-endif()
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/zookeeper/system")
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/system")
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/wangle/system")
+endif(BUILD_LOCAL_DEPENDENCIES)
+
+############
+## Validate that we have C++ 14 support
+############
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX14)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+ message(FATAL "The compiler ${CMAKE_CXX_COMPILER} has no c++14 support. Please use a different C++ compiler.")
+endif()
+
+
 set(HBASE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/hbase")
 set(HBASE_PROTO_GEN_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/hbase/if")
 set(HBASE_PROTO_GEN_INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/hbase/if")
@@ -50,10 +122,23 @@ if (OPENSSL_FOUND)
 else ()
     message( FATAL_ERROR "OpenSSL was not found. Please install OpenSSL" )
 endif (OPENSSL_FOUND)
+## Download Facebook Folly and build locally
+
+
+if (BUILD_LOCAL_DEPENDENCIES)
+	download_folly(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+	download_wangle(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+	download_zookeeper(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+endif(BUILD_LOCAL_DEPENDENCIES)
+
 # ensure we have required dependencies
 find_package(Threads)
-find_package(Boost REQUIRED COMPONENTS thread system filesystem)
+find_package(Boost REQUIRED COMPONENTS context thread system filesystem regex)
+find_package(LibEvent REQUIRED)
 find_package(Gflags REQUIRED)
+if (BUILD_LOCAL_DEPENDENCIES)
+	find_package(Sodium REQUIRED)
+endif(BUILD_LOCAL_DEPENDENCIES)
 find_package(Folly REQUIRED)
 find_package(Krb5 REQUIRED)
 find_package(Sasl2 REQUIRED)
@@ -64,6 +149,7 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 find_package(Zookeeper REQUIRED)
 find_package(Protobuf REQUIRED)
+find_Package(DoubleConversion REQUIRED)
 if (NOT FOLLY_FOUND)
  message(FATAL_ERROR "-- Folly not found")
 endif()
@@ -80,11 +166,12 @@ endif()
 ### and including those from our
 include_directories(include)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
-include_directories(${Zookeeper_INCLUDE_DIRS})
+include_directories(${ZOOKEEPER_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${KRB5_INCLUDE_DIRS})
 include_directories(${JAVA_INCLUDE_DIRS})
-include_directories(${FOLLY_INCLUDE_DIRS})
+include_directories(${FOLLY_INCLUDE_DIR})
+include_directories(${WANGLE_INCLUDE_DIR})
 ### create a directory for the hbase protobuf headers.
 ### this is helpful so that when we include it, later, we can generate
 ### the protocol buffer source/headers without polluting our tree.
@@ -109,29 +196,43 @@ generate_protobuf_src(PROTO_SOURCES PROTO_HEADERS  ${PROTO_FILES})
 add_library(hbaseclient-static STATIC ${PROTO_SOURCES} ${CLIENT_SRC} ${CONNECTION_SRC} ${EXCEPTION_SRC} ${PROTO_SRC} ${SECURITY_SRC} ${SRDE_SRC} ${UTILS_SRC})
 set_target_properties(hbaseclient-static PROPERTIES LINKER_LANGUAGE CXX)
 SET_TARGET_PROPERTIES(hbaseclient-static PROPERTIES OUTPUT_NAME hbaseclient CLEAN_DIRECT_OUTPUT 1)
-target_link_libraries(hbaseclient-static ${PROTOBUF_LIBRARY})
-target_link_libraries(hbaseclient-static ${FOLLY_LIBRARIES})
 target_link_libraries(hbaseclient-static ${Boost_LIBRARIES})
 target_link_libraries(hbaseclient-static ${SASL_LIBS})
-target_link_libraries(hbaseclient-static ${GLOG_SHARED_LIB})
 target_link_libraries(hbaseclient-static ${GFLAGS_SHARED_LIB})
 target_link_libraries(hbaseclient-static ${KRB5_LIBRARIES})
 target_link_libraries(hbaseclient-static ${WANGLE_LIBRARIES})
-target_link_libraries(hbaseclient-static ${Zookeeper_LIBRARIES})
+if (BUILD_LOCAL_DEPENDENCIES)
+	target_link_libraries(hbaseclient-static ${sodium_LIBRARY_RELEASE})
+endif(BUILD_LOCAL_DEPENDENCIES)
+target_link_libraries(hbaseclient-static ${FOLLY_LIBRARIES})
+target_link_libraries(hbaseclient-static ${GLOG_SHARED_LIB})
+target_link_libraries(hbaseclient-static ${LIB_EVENT_LIBRARY})
+target_link_libraries(hbaseclient-static ${PROTOBUF_LIBRARY})
+target_link_libraries(hbaseclient-static ${DOUBLE_CONVERSION_LIBRARY})
+target_link_libraries(hbaseclient-static ${ZOOKEEPER_LIBRARIES})
 target_link_libraries(hbaseclient-static ${OPENSSL_LIBRARIES})
+target_link_libraries(hbaseclient-static ${CMAKE_DL_LIBS})
+
 add_library(hbaseclient-shared SHARED ${PROTO_SOURCES} ${CLIENT_SRC} ${CONNECTION_SRC} ${EXCEPTION_SRC} ${PROTO_SRC} ${SECURITY_SRC} ${SRDE_SRC} ${UTILS_SRC})
 set_target_properties(hbaseclient-shared PROPERTIES LINKER_LANGUAGE CXX)
 SET_TARGET_PROPERTIES(hbaseclient-shared PROPERTIES COMPILE_FLAGS " -fPIC")
 SET_TARGET_PROPERTIES(hbaseclient-shared PROPERTIES OUTPUT_NAME hbaseclient CLEAN_DIRECT_OUTPUT 1)
 target_link_libraries(hbaseclient-shared ${PROTOBUF_LIBRARY})
-target_link_libraries(hbaseclient-shared ${FOLLY_LIBRARIES})
 target_link_libraries(hbaseclient-shared ${Boost_LIBRARIES})
+target_link_libraries(hbaseclient-shared ${WANGLE_LIBRARIES})
+if (BUILD_LOCAL_DEPENDENCIES)
+	target_link_libraries(hbaseclient-shared ${sodium_LIBRARY_RELEASE})
+endif(BUILD_LOCAL_DEPENDENCIES)
+target_link_libraries(hbaseclient-shared ${FOLLY_LIBRARIES})
 target_link_libraries(hbaseclient-shared ${SASL_LIBS})
 target_link_libraries(hbaseclient-shared ${GLOG_SHARED_LIB})
 target_link_libraries(hbaseclient-shared ${GFLAGS_SHARED_LIB})
 target_link_libraries(hbaseclient-shared ${KRB5_LIBRARIES})
-target_link_libraries(hbaseclient-shared ${WANGLE_LIBRARIES})
-target_link_libraries(hbaseclient-shared ${Zookeeper_LIBRARIES})
+target_link_libraries(hbaseclient-shared ${OPENSSL_LIBRARIES})
+target_link_libraries(hbaseclient-shared ${LIB_EVENT_LIBRARY})
+target_link_libraries(hbaseclient-shared ${ZOOKEEPER_LIBRARIES})
+target_link_libraries(hbaseclient-shared ${DOUBLE_CONVERSION_LIBRARY})
+target_link_libraries(hbaseclient-shared ${CMAKE_DL_LIBS})
 add_executable(simple-client "${HBASE_SRC_DIR}/examples/simple-client.cc")
 SET_TARGET_PROPERTIES(simple-client PROPERTIES COMPILE_FLAGS "  ")
 target_link_libraries(simple-client ${PROTOBUF_LIBRARY})
@@ -139,7 +240,7 @@ target_link_libraries(simple-client ${Boost_LIBRARIES})
 target_link_libraries(simple-client ${SASL_LIBS})
 target_link_libraries(simple-client ${GFLAGS_SHARED_LIB})
 target_link_libraries(simple-client ${KRB5_LIBRARIES})
-target_link_libraries(simple-client ${Zookeeper_LIBRARIES})
+target_link_libraries(simple-client ${ZOOKEEPER_LIBRARIES})
 target_link_libraries(simple-client hbaseclient-static ${CMAKE_THREAD_LIBS_INIT})
 add_executable(load-client "${HBASE_SRC_DIR}/examples/load-client.cc")
 SET_TARGET_PROPERTIES(load-client PROPERTIES COMPILE_FLAGS "  ")
@@ -148,7 +249,7 @@ target_link_libraries(load-client ${Boost_LIBRARIES})
 target_link_libraries(load-client ${SASL_LIBS})
 target_link_libraries(load-client ${GFLAGS_SHARED_LIB})
 target_link_libraries(load-client ${KRB5_LIBRARIES})
-target_link_libraries(load-client ${Zookeeper_LIBRARIES})
+target_link_libraries(load-client ${ZOOKEEPER_LIBRARIES})
 target_link_libraries(load-client hbaseclient-static ${CMAKE_THREAD_LIBS_INIT})
 if (JNI_FOUND)
     message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
@@ -166,6 +267,19 @@ add_custom_target (
 	copy_version_h
         COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/bin/copy-version.sh"
 )
+
+if (BUILD_LOCAL_DEPENDENCIES)
+	add_dependencies(hbaseclient-static Protobuf)
+	add_dependencies(hbaseclient-shared Protobuf)
+
+	add_dependencies(facebook-wangle-proj facebook-folly-proj)
+	add_dependencies(hbaseclient-static facebook-wangle-proj)
+	add_dependencies(hbaseclient-shared facebook-wangle-proj)
+
+	add_dependencies(hbaseclient-static zookeeper)
+	add_dependencies(hbaseclient-shared zookeeper)
+endif(BUILD_LOCAL_DEPENDENCIES)
+
 add_dependencies(hbaseclient-static copy_version_h)
 add_dependencies(hbaseclient-shared copy_version_h)
 
