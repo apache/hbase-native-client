@@ -17,12 +17,12 @@
 # copied in most part from protobuf cmake
 # there are similar protobuf gen changes online, all of which do
 # a similar job of customizing their generation.
-function(generate_protobuf_src SRCS HDRS)
+function(generate_protobuf_src SRCS HDRS HDR_DIR PROTO_PATH)
   if(NOT ARGN)
     message(SEND_ERROR "Error: generate_protobuf_src() called without any proto files")
     return()
   endif()
-
+  	message(STATUS "Generating proto files using proto path: ${PROTO_PATH}")
   set(_protobuf_include_path -I .)
   if(DEFINED PROTOBUF_INCLUDE_DIRS)
     foreach(DIR ${PROTOBUF_INCLUDE_DIRS})
@@ -40,17 +40,21 @@ function(generate_protobuf_src SRCS HDRS)
     get_filename_component(FIL_WE ${FIL} NAME_WE)
     ## get the directory where our protobufs are stored
     file(RELATIVE_PATH REL_FIL ${CMAKE_SOURCE_DIR} ${ABS_FIL})
+    file(RELATIVE_PATH REL_FILE_TO_BASE ${PROTO_PATH} ${ABS_FIL})
     get_filename_component(REL_DIR ${REL_FIL} DIRECTORY)
-    list(APPEND ${SRCS} "${CMAKE_BINARY_DIR_GEN}/${FIL_WE}.pb.cc")
-    list(APPEND ${HDRS} "${CMAKE_BINARY_DIR_GEN}/${FIL_WE}.pb.h")
+    get_filename_component(REL_FILE_TO_BASE_DIR ${REL_FILE_TO_BASE} DIRECTORY)
+	set(REL_FILE_TO_BASE "${REL_FILE_TO_BASE_DIR}/${FIL_WE}")    
+	set(${HDR_DIR} "${CMAKE_BINARY_DIR_GEN}/" PARENT_SCOPE)
+    list(APPEND ${SRCS} "${CMAKE_BINARY_DIR_GEN}/${REL_FILE_TO_BASE}.pb.cc")
+    list(APPEND ${HDRS} "${CMAKE_BINARY_DIR_GEN}/${REL_FILE_TO_BASE}.pb.h")
     add_custom_command(
-      OUTPUT "${CMAKE_BINARY_DIR_GEN}/${FIL_WE}.pb.cc"
-             "${CMAKE_BINARY_DIR_GEN}/${FIL_WE}.pb.h"
+      OUTPUT "${CMAKE_BINARY_DIR_GEN}/${REL_FILE_TO_BASE}.pb.cc"
+             "${CMAKE_BINARY_DIR_GEN}/${REL_FILE_TO_BASE}.pb.h"
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
       ARGS --cpp_out=${CMAKE_BINARY_DIR_GEN}
-	      --proto_path=${REL_DIR}
+	      --proto_path=${PROTO_PATH}
            ${_protobuf_include_path}
-           ${REL_FIL}
+           ${ABS_FIL}
       DEPENDS ${ABS_FIL} ${PROTOBUF_PROTOC_EXECUTABLE}
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
       COMMENT "Generating ${FIL}"

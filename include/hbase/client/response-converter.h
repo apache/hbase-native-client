@@ -26,7 +26,7 @@
 #include "hbase/client/multi-response.h"
 #include "hbase/client/result.h"
 #include "hbase/client/server-request.h"
-#include "hbase/if/Client.pb.h"
+#include "hbase/if/client/Client.pb.h"
 #include "hbase/serde/cell-scanner.h"
 
 namespace hbase {

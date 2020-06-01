@@ -36,7 +36,7 @@
 #include "hbase/client/hbase-rpc-controller.h"
 #include "hbase/client/keyvalue-codec.h"
 #include "hbase/client/location-cache.h"
-#include "hbase/if/Cell.pb.h"
+#include "Cell.pb.h"
 #include "hbase/serde/table-name.h"
 
 namespace hbase {

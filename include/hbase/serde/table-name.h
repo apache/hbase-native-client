@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "hbase/if/HBase.pb.h"
+#include "HBase.pb.h"
 
 namespace hbase {
 namespace pb {

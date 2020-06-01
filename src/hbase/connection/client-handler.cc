@@ -27,8 +27,8 @@
 
 #include "hbase/connection/request.h"
 #include "hbase/connection/response.h"
-#include "hbase/if/Client.pb.h"
-#include "hbase/if/RPC.pb.h"
+#include "client/Client.pb.h"
+#include "rpc/RPC.pb.h"
 
 using google::protobuf::Message;
 

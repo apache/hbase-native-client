@@ -1,0 +1,4 @@
+3480c3480
+<     static char buf[128];
+---
+>     static char buf[128+6] = {0};

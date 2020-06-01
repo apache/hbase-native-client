@@ -24,7 +24,7 @@
 
 #include "hbase/connection/rpc-test-server-handler.h"
 #include "hbase/connection/rpc-test-server.h"
-#include "hbase/if/test.pb.h"
+#include "test/ipc/test.pb.h"
 
 namespace hbase {
 

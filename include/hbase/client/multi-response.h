@@ -27,7 +27,7 @@
 
 #include "hbase/client/region-result.h"
 #include "hbase/client/result.h"
-#include "hbase/if/Client.pb.h"
+#include "client/Client.pb.h"
 
 namespace hbase {
 

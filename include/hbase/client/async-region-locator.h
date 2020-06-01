@@ -25,7 +25,7 @@
 #include <string>
 
 #include "hbase/client/region-location.h"
-#include "hbase/if/Client.pb.h"
+#include "hbase/if/client/Client.pb.h"
 #include "hbase/serde/region-info.h"
 #include "hbase/serde/server-name.h"
 #include "hbase/serde/table-name.h"

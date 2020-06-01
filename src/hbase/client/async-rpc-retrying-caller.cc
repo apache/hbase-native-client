@@ -31,7 +31,7 @@
 #include "hbase/client/region-location.h"
 #include "hbase/client/result.h"
 #include "hbase/exceptions/exception.h"
-#include "hbase/if/HBase.pb.h"
+#include "HBase.pb.h"
 #include "hbase/utils/connection-util.h"
 #include "hbase/utils/sys-util.h"
 #include "hbase/utils/time-util.h"

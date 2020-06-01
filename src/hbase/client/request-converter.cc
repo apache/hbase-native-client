@@ -22,7 +22,7 @@
 #include <folly/Conv.h>
 
 #include <utility>
-#include "hbase/if/Client.pb.h"
+#include "client/Client.pb.h"
 
 using hbase::pb::GetRequest;
 using hbase::pb::MutationProto;

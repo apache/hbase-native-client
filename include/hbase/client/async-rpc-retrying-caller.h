@@ -35,7 +35,7 @@
 #include "hbase/client/hbase-rpc-controller.h"
 #include "hbase/client/region-location.h"
 #include "hbase/exceptions/exception.h"
-#include "hbase/if/HBase.pb.h"
+#include "HBase.pb.h"
 
 namespace hbase {
 

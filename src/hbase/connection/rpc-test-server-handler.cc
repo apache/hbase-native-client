@@ -18,8 +18,8 @@
  */
 
 #include "hbase/connection/rpc-test-server-handler.h"
-#include "hbase/if/RPC.pb.h"
-#include "hbase/if/test.pb.h"
+#include "rpc/RPC.pb.h"
+#include "test/ipc/test.pb.h"
 
 namespace hbase {
 

@@ -34,7 +34,7 @@
 
 #include "hbase/connection/rpc-client.h"
 #include "hbase/exceptions/exception.h"
-#include "hbase/if/test.pb.h"
+#include "test/ipc/test.pb.h"
 #include "hbase/connection/rpc-test-server.h"
 #include "hbase/security/user.h"
 #include "hbase/serde/rpc-serde.h"

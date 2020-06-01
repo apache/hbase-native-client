@@ -19,7 +19,7 @@
 
 #include "hbase/connection/request.h"
 
-#include "hbase/if/Client.pb.h"
+#include "hbase/if/client/Client.pb.h"
 
 namespace hbase {
 

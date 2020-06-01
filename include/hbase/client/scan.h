@@ -26,7 +26,7 @@
 #include <vector>
 #include "hbase/client/get.h"
 #include "hbase/client/time-range.h"
-#include "hbase/if/Client.pb.h"
+#include "client/Client.pb.h"
 
 namespace hbase {
 
