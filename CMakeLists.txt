@@ -33,7 +33,10 @@ include(CheckCXXCompilerFlag)
 
 
 option(BUILD_LOCAL_DEPENDENCIES "Downloads and builds all dependencies locally " OFF)
-option(HBASE_TARGET_TAG "Downloads and builds all dependencies locally " OFF)
+option(HBASE_TARGET_TAG "Downloads and builds all dependencies locally" "e5345b3a7c32c6a80394319c17540b84c8fe66ba")
+option(BUILD_HBASE  "Builds Hbase " OFF)
+
+
 
 ######### Includes
 
@@ -80,6 +83,19 @@ if (BUILD_LOCAL_DEPENDENCIES)
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/protobuf/local")
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local")
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/wangle/local")
+
+	## Build Apache HBase components that are necessary for this project
+
+	if( BUILD_HBASE )
+		## Download Apache HBase, and build hbase-common so that we can have a targeted build of version.h
+		download_project(PROJ apachehbase
+			IS_MAVEN
+			MAVEN_DIR "hbase-common"
+			GIT_REPOSITORY "https://github.com/apache/hbase.git"
+	  		GIT_TAG "${HBASE_TARGET_TAG}")
+
+		include_directories("${CMAKE_CURRENT_BINARY_DIR}/apachehbase-src/hbase-common/target/generated-sources/native/")
+	endif(BUILD_HBASE)
 else()
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/zookeeper/system")
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/system")
@@ -104,6 +120,11 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 else()
  message(FATAL "The compiler ${CMAKE_CXX_COMPILER} has no c++14 support. Please use a different C++ compiler.")
 endif()
+
+if (BUILD_HBASE)
+	find_package(Java REQUIRED)
+	find_package(Maven REQUIRED)
+endif(BUILD_HBASE)
 
 
 set(HBASE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/hbase")
@@ -263,11 +284,16 @@ add_custom_target(
     linter
     COMMAND ${CMAKE_SOURCE_DIR}/bin/cpplint.sh)
 # Copy the version.h file in before doing anything
-add_custom_target (
-	copy_version_h
-        COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/bin/copy-version.sh"
-)
+if (NOT BUILD_HBASE)
+	add_custom_target (
+		copy_version_h
+	        COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/bin/copy-version.sh"
+	)
+	
+	add_dependencies(hbaseclient-static copy_version_h)
+	add_dependencies(hbaseclient-shared copy_version_h)
 
+endif(NOT BUILD_HBASE)
 if (BUILD_LOCAL_DEPENDENCIES)
 	add_dependencies(hbaseclient-static Protobuf)
 	add_dependencies(hbaseclient-shared Protobuf)
@@ -280,8 +306,7 @@ if (BUILD_LOCAL_DEPENDENCIES)
 	add_dependencies(hbaseclient-shared zookeeper)
 endif(BUILD_LOCAL_DEPENDENCIES)
 
-add_dependencies(hbaseclient-static copy_version_h)
-add_dependencies(hbaseclient-shared copy_version_h)
+
 
 # Install library headers
 include(GNUInstallDirs)

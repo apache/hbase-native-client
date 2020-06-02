@@ -29,7 +29,7 @@
 
 #include "hbase/if/RPC.pb.h"
 #include "hbase/serde/rpc-serde.h"
-#include "hbase/utils/version.h"
+#include "utils/version.h"
 
 using folly::IOBuf;
 using folly::io::RWPrivateCursor;
