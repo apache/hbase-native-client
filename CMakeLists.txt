@@ -305,17 +305,7 @@ endif()
 add_custom_target(
     linter
     COMMAND ${CMAKE_SOURCE_DIR}/bin/cpplint.sh)
-# Copy the version.h file in before doing anything
-if (NOT BUILD_HBASE)
-	add_custom_target (
-		copy_version_h
-	        COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/bin/copy-version.sh"
-	)
-	
-	add_dependencies(hbaseclient-static copy_version_h)
-	add_dependencies(hbaseclient-shared copy_version_h)
 
-endif(NOT BUILD_HBASE)
 if (DOWNLOAD_DEPENDENCIES)
 	add_dependencies(hbaseclient-static Protobuf)
 	add_dependencies(hbaseclient-shared Protobuf)
