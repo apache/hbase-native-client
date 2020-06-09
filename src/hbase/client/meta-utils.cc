@@ -28,7 +28,7 @@
 #include "hbase/connection/response.h"
 #include "hbase/client/response-converter.h"
 #include "hbase/exceptions/exception.h"
-#include "hbase/if/Client.pb.h"
+#include "client/Client.pb.h"
 #include "hbase/serde/region-info.h"
 #include "hbase/serde/server-name.h"
 #include "hbase/serde/table-name.h"

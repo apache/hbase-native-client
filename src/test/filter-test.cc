@@ -24,8 +24,8 @@
 #include "hbase/client/put.h"
 #include "hbase/client/result.h"
 #include "hbase/client/table.h"
-#include "hbase/if/Comparator.pb.h"
-#include "hbase/if/HBase.pb.h"
+#include "client/Comparator.pb.h"
+#include "HBase.pb.h"
 #include "hbase/serde/table-name.h"
 #include "hbase/test-util/test-util.h"
 

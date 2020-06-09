@@ -24,7 +24,7 @@
 #include "hbase/connection/request.h"
 #include "hbase/connection/response.h"
 #include "hbase/client/region-location.h"
-#include "hbase/if/HBase.pb.h"
+#include "HBase.pb.h"
 #include "hbase/serde/table-name.h"
 
 namespace hbase {

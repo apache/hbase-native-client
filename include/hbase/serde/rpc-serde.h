@@ -22,7 +22,7 @@
 #include <string>
 
 #include <folly/ExceptionWrapper.h>
-#include "hbase/if/HBase.pb.h"
+#include "HBase.pb.h"
 #include "hbase/serde/cell-scanner.h"
 #include "hbase/serde/codec.h"
 

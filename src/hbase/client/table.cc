@@ -28,7 +28,7 @@
 #include "hbase/client/async-table-result-scanner.h"
 #include "hbase/client/request-converter.h"
 #include "hbase/client/response-converter.h"
-#include "hbase/if/Client.pb.h"
+#include "hbase/if/client/Client.pb.h"
 #include "hbase/security/user.h"
 #include "hbase/serde/server-name.h"
 #include "hbase/utils/time-util.h"

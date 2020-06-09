@@ -29,22 +29,23 @@ include(CMakeDependentOption)
 include(CheckIncludeFile)
 include(ExternalProject)
 include(DownloadProject)
+include(ExecuteMaven)
 include(CheckCXXCompilerFlag)
 
 
-option(BUILD_LOCAL_DEPENDENCIES "Downloads and builds all dependencies locally " OFF)
-option(HBASE_TARGET_TAG "Downloads and builds all dependencies locally" "e5345b3a7c32c6a80394319c17540b84c8fe66ba")
-option(BUILD_HBASE  "Builds Hbase " OFF)
-
-
-
-######### Includes
-
+option(DOWNLOAD_DEPENDENCIES "Downloads and builds all dependencies locally " OFF)
+option(HBASE_TARGET_TAG "HBase tag to be used if HBASE_HOME is not set" "e5345b3a7c32c6a80394319c17540b84c8fe66ba")
+option(HBASE_HOME "Path to HBase" "")
+option(BUILD_HBASE "Build HBASE_HOME path if it is provided" OFF)
 	
+## Define the build byproduct prefix, suffix, and shared lib suffix
+## These will be used in built local dependencies to locate and identify
+## object files. These are defined here as they will be used throughout 
+## the cmake modules.
 if (WIN32)
-	set(BYPRODUCT_SUFFIX ".lib" CACHE STRING "" FORCE)
-	set(BYPRODUCT_SHARED_SUFFIX ".lib" CACHE STRING "" FORCE)
 	set(BYPRODUCT_PREFIX "" CACHE STRING "" FORCE)
+	set(BYPRODUCT_SHARED_SUFFIX ".lib" CACHE STRING "" FORCE)
+	set(BYPRODUCT_SUFFIX ".lib" CACHE STRING "" FORCE)
 	set(BUILD_ARGS " -GVisual Studio 15 2017")
 else()
 	set(BYPRODUCT_PREFIX "lib" CACHE STRING "" FORCE)
@@ -53,19 +54,17 @@ else()
 endif()
 	
 
-
+######### Includes
 ## include the Protobuf generation code
 include(ProtobufGen)
 include(DownloadFolly)
 include(DownloadWangle)
 include(DownloadZookeeper)
 
-if (BUILD_LOCAL_DEPENDENCIES)
+if (DOWNLOAD_DEPENDENCIES)
+	
 	## we want to find the system protoc
-	download_project(PROJ Protobuf
-				 IS_AUTOGEN
-				 GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
-	  			 GIT_TAG "3.5.1.1")
+	download_project(PROJ Protobuf IS_AUTOGEN GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git" GIT_TAG "3.5.1.1")
 	  			 
 	set(PROTOBUF_DIR "${Protobuf_BINARY_DIR}" CACHE STRING "" FORCE)
 	
@@ -84,24 +83,39 @@ if (BUILD_LOCAL_DEPENDENCIES)
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local")
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/wangle/local")
 
-	## Build Apache HBase components that are necessary for this project
-
-	if( BUILD_HBASE )
-		## Download Apache HBase, and build hbase-common so that we can have a targeted build of version.h
-		download_project(PROJ apachehbase
-			IS_MAVEN
-			MAVEN_DIR "hbase-common"
-			GIT_REPOSITORY "https://github.com/apache/hbase.git"
-	  		GIT_TAG "${HBASE_TARGET_TAG}")
-
-		include_directories("${CMAKE_CURRENT_BINARY_DIR}/apachehbase-src/hbase-common/target/generated-sources/native/")
-	endif(BUILD_HBASE)
 else()
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/zookeeper/system")
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/system")
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/wangle/system")
-endif(BUILD_LOCAL_DEPENDENCIES)
+endif(DOWNLOAD_DEPENDENCIES)
 
+## Build Apache HBase components that are necessary for this project
+
+find_package(Java REQUIRED)
+find_package(Maven REQUIRED)
+
+if( NOT HBASE_HOME )
+	if (DOWNLOAD_DEPENDENCIES)
+		## Download Apache HBase, and build hbase-common so that we can have a targeted build of version.h
+		download_project(PROJ apachehbase  IS_MAVEN GIT_REPOSITORY "https://github.com/apache/hbase.git" GIT_TAG "${HBASE_TARGET_TAG}")
+		set(JAVA_HBASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/apachehbase-src/")
+	else()
+		message(FATAL_ERROR "HBASE_HOME must be defined if local dependencies aren't built")
+	endif()
+else()
+	if (BUILD_HBASE)
+		message(STATUS "Building HBase in ${HBASE_HOME}")
+		execute_maven(${HBASE_HOME} mvn_output mvn_result)
+		if(NOT "${mvn_result}" STREQUAL "0")
+			message(FATAL_ERROR "Failed to build HBase. Please provide a valid path with HBASE_HOME")
+		endif()
+	else()
+		message(STATUS "Using supplied HBase path ${HBASE_HOME}")
+	endif()
+	set(JAVA_HBASE_DIR "${HBASE_HOME}")
+endif()
+
+include_directories("${JAVA_HBASE_DIR}/hbase-common/target/generated-sources/native/")
 ############
 ## Validate that we have C++ 14 support
 ############
@@ -118,13 +132,10 @@ if(COMPILER_SUPPORTS_CXX14)
 elseif(COMPILER_SUPPORTS_CXX0X)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
- message(FATAL "The compiler ${CMAKE_CXX_COMPILER} has no c++14 support. Please use a different C++ compiler.")
+ message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no c++14 support. Please use a different C++ compiler.")
 endif()
 
-if (BUILD_HBASE)
-	find_package(Java REQUIRED)
-	find_package(Maven REQUIRED)
-endif(BUILD_HBASE)
+
 
 
 set(HBASE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/hbase")
@@ -146,20 +157,20 @@ endif (OPENSSL_FOUND)
 ## Download Facebook Folly and build locally
 
 
-if (BUILD_LOCAL_DEPENDENCIES)
+if (DOWNLOAD_DEPENDENCIES)
 	download_folly(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	download_wangle(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 	download_zookeeper(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-endif(BUILD_LOCAL_DEPENDENCIES)
+endif(DOWNLOAD_DEPENDENCIES)
 
 # ensure we have required dependencies
 find_package(Threads)
 find_package(Boost REQUIRED COMPONENTS context thread system filesystem regex)
 find_package(LibEvent REQUIRED)
 find_package(Gflags REQUIRED)
-if (BUILD_LOCAL_DEPENDENCIES)
+if (DOWNLOAD_DEPENDENCIES)
 	find_package(Sodium REQUIRED)
-endif(BUILD_LOCAL_DEPENDENCIES)
+endif(DOWNLOAD_DEPENDENCIES)
 find_package(Folly REQUIRED)
 find_package(Krb5 REQUIRED)
 find_package(Sasl2 REQUIRED)
@@ -210,10 +221,21 @@ file(GLOB_RECURSE TEST_UTIL "${HBASE_SRC_DIR}/test-util/*.cc"  )
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY})
 include_directories(${SASL_INCLUDE_DIRS})
 include_directories(${GFLAGS_INCLUDE_DIR})
-file(GLOB_RECURSE PROTO_FILES "${HBASE_SRC_DIR}/if/*.proto"  )
-### generate the protocol buffers.
-generate_protobuf_src(PROTO_SOURCES PROTO_HEADERS  ${PROTO_FILES})
 
+## Use the java proto files defined by the tag
+file(GLOB_RECURSE PROTO_FILES "${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/client/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/rpc/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/server/master/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/server/io/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/server/zookeeper/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/server/region/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/server/rsgroup/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/server/*.proto" 
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/test/ipc/*.proto"
+	"${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf/*.proto" )
+### generate the protocol buffers.
+generate_protobuf_src(PROTO_SOURCES PROTO_HEADERS PROTO_HEADER_DIR "${JAVA_HBASE_DIR}/hbase-protocol-shaded/src/main/protobuf" ${PROTO_FILES})
+include_directories(${PROTO_HEADER_DIR})
 add_library(hbaseclient-static STATIC ${PROTO_SOURCES} ${CLIENT_SRC} ${CONNECTION_SRC} ${EXCEPTION_SRC} ${PROTO_SRC} ${SECURITY_SRC} ${SRDE_SRC} ${UTILS_SRC})
 set_target_properties(hbaseclient-static PROPERTIES LINKER_LANGUAGE CXX)
 SET_TARGET_PROPERTIES(hbaseclient-static PROPERTIES OUTPUT_NAME hbaseclient CLEAN_DIRECT_OUTPUT 1)
@@ -222,9 +244,9 @@ target_link_libraries(hbaseclient-static ${SASL_LIBS})
 target_link_libraries(hbaseclient-static ${GFLAGS_SHARED_LIB})
 target_link_libraries(hbaseclient-static ${KRB5_LIBRARIES})
 target_link_libraries(hbaseclient-static ${WANGLE_LIBRARIES})
-if (BUILD_LOCAL_DEPENDENCIES)
+if (DOWNLOAD_DEPENDENCIES)
 	target_link_libraries(hbaseclient-static ${sodium_LIBRARY_RELEASE})
-endif(BUILD_LOCAL_DEPENDENCIES)
+endif(DOWNLOAD_DEPENDENCIES)
 target_link_libraries(hbaseclient-static ${FOLLY_LIBRARIES})
 target_link_libraries(hbaseclient-static ${GLOG_SHARED_LIB})
 target_link_libraries(hbaseclient-static ${LIB_EVENT_LIBRARY})
@@ -241,9 +263,9 @@ SET_TARGET_PROPERTIES(hbaseclient-shared PROPERTIES OUTPUT_NAME hbaseclient CLEA
 target_link_libraries(hbaseclient-shared ${PROTOBUF_LIBRARY})
 target_link_libraries(hbaseclient-shared ${Boost_LIBRARIES})
 target_link_libraries(hbaseclient-shared ${WANGLE_LIBRARIES})
-if (BUILD_LOCAL_DEPENDENCIES)
+if (DOWNLOAD_DEPENDENCIES)
 	target_link_libraries(hbaseclient-shared ${sodium_LIBRARY_RELEASE})
-endif(BUILD_LOCAL_DEPENDENCIES)
+endif(DOWNLOAD_DEPENDENCIES)
 target_link_libraries(hbaseclient-shared ${FOLLY_LIBRARIES})
 target_link_libraries(hbaseclient-shared ${SASL_LIBS})
 target_link_libraries(hbaseclient-shared ${GLOG_SHARED_LIB})
@@ -294,7 +316,7 @@ if (NOT BUILD_HBASE)
 	add_dependencies(hbaseclient-shared copy_version_h)
 
 endif(NOT BUILD_HBASE)
-if (BUILD_LOCAL_DEPENDENCIES)
+if (DOWNLOAD_DEPENDENCIES)
 	add_dependencies(hbaseclient-static Protobuf)
 	add_dependencies(hbaseclient-shared Protobuf)
 
@@ -304,7 +326,7 @@ if (BUILD_LOCAL_DEPENDENCIES)
 
 	add_dependencies(hbaseclient-static zookeeper)
 	add_dependencies(hbaseclient-shared zookeeper)
-endif(BUILD_LOCAL_DEPENDENCIES)
+endif(DOWNLOAD_DEPENDENCIES)
 
 
 

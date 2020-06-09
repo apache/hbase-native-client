@@ -35,8 +35,8 @@
 #include "hbase/client/scan-result-cache.h"
 #include "hbase/client/scan.h"
 
-#include "hbase/if/Client.pb.h"
-#include "hbase/if/HBase.pb.h"
+#include "client/Client.pb.h"
+#include "HBase.pb.h"
 
 namespace hbase {
 

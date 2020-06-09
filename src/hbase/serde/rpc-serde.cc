@@ -27,7 +27,7 @@
 
 #include <utility>
 
-#include "hbase/if/RPC.pb.h"
+#include "rpc/RPC.pb.h"
 #include "hbase/serde/rpc-serde.h"
 #include "utils/version.h"
 

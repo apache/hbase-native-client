@@ -25,9 +25,9 @@
 #include <utility>
 #include <vector>
 
-#include "hbase/if/Comparator.pb.h"
-#include "hbase/if/Filter.pb.h"
-#include "hbase/if/HBase.pb.h"
+#include "client/Comparator.pb.h"
+#include "client/Filter.pb.h"
+#include "HBase.pb.h"
 
 namespace hbase {
 

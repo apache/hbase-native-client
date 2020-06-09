@@ -44,8 +44,8 @@
 #include "hbase/client/response-converter.h"
 #include "hbase/client/result.h"
 #include "hbase/exceptions/exception.h"
-#include "hbase/if/Client.pb.h"
-#include "hbase/if/HBase.pb.h"
+#include "client/Client.pb.h"
+#include "HBase.pb.h"
 #include "hbase/test-util/test-util.h"
 #include "hbase/utils/time-util.h"
 

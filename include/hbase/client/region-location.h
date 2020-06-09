@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "hbase/if/HBase.pb.h"
+#include "HBase.pb.h"
 
 namespace hbase {
 

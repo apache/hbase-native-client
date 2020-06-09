@@ -24,7 +24,7 @@
 #include <folly/io/IOBuf.h>
 #include <gtest/gtest.h>
 
-#include "hbase/if/ZooKeeper.pb.h"
+#include "server/zookeeper/ZooKeeper.pb.h"
 
 using namespace hbase;
 using namespace hbase::pb;

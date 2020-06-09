@@ -34,8 +34,8 @@
 #include "hbase/client/region-request.h"
 #include "hbase/client/scan.h"
 #include "hbase/client/server-request.h"
-#include "hbase/if/Client.pb.h"
-#include "hbase/if/HBase.pb.h"
+#include "client/Client.pb.h"
+#include "HBase.pb.h"
 
 using MutationType = hbase::pb::MutationProto_MutationType;
 using DeleteType = hbase::pb::MutationProto_DeleteType;

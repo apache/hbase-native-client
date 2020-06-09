@@ -200,12 +200,16 @@ function(download_project)
             message(FATAL_ERROR "Build step for ${DL_ARGS_PROJ} failed: ${result}")
         endif()
     if (DL_ARGS_IS_MAVEN)
-        message("-- Building ${DL_ARGS_PROJ} in ${DL_ARGS_SOURCE_DIR}/${DL_ARGS_MAVEN_DIR}")
+        message(STATUS "Building ${DL_ARGS_PROJ} in ${DL_ARGS_SOURCE_DIR}/${DL_ARGS_MAVEN_DIR}")
         execute_process(COMMAND "${MAVEN_EXECUTABLE}" "-q" "package" "-DskipTests" "-Denforcer.skip=true"
 	        WORKING_DIRECTORY "${DL_ARGS_SOURCE_DIR}/${DL_ARGS_MAVEN_DIR}"
 	        RESULT_VARIABLE result
   	        OUTPUT_VARIABLE output
-	        ERROR_VARIABLE error_variable)       
+	        ERROR_VARIABLE error_variable)
+      
+        if(NOT "${result}" STREQUAL "0")
+			message(FATAL_ERROR "Failed to build ${DL_ARGS_PROJ}. Command output: ${output}")
+		endif()
     endif(DL_ARGS_IS_MAVEN)
 
 endfunction()

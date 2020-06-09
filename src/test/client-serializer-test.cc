@@ -22,8 +22,8 @@
 
 #include <string>
 
-#include "hbase/if/HBase.pb.h"
-#include "hbase/if/RPC.pb.h"
+#include "HBase.pb.h"
+#include "rpc/RPC.pb.h"
 #include "hbase/serde/rpc-serde.h"
 
 using namespace hbase;

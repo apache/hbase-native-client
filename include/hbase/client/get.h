@@ -27,7 +27,7 @@
 #include "hbase/client/query.h"
 #include "hbase/client/row.h"
 #include "hbase/client/time-range.h"
-#include "hbase/if/Client.pb.h"
+#include "client/Client.pb.h"
 
 namespace hbase {
 

@@ -21,7 +21,7 @@
 
 function(download_wangle SOURCE_DIR BUILD_DIR)
 
-	if (BUILD_LOCAL_DEPENDENCIES)
+	if (DOWNLOAD_DEPENDENCIES)
 		SET (PATCH_FOLLY ${CMAKE_COMMAND} -E copy
       		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local/FindFolly.cmake" ${BUILD_DIR}/facebook-wangle-proj-prefix/src/facebook-wangle-proj/wangle/cmake )
 	else()

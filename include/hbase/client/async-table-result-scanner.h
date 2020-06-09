@@ -32,8 +32,8 @@
 #include "hbase/client/raw-scan-result-consumer.h"
 #include "hbase/client/result-scanner.h"
 #include "hbase/client/result.h"
-#include "hbase/if/Client.pb.h"
-#include "hbase/if/HBase.pb.h"
+#include "client/Client.pb.h"
+#include "HBase.pb.h"
 
 namespace hbase {
 

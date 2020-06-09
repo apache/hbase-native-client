@@ -19,7 +19,7 @@
 #include <folly/io/IOBuf.h>
 #include <gtest/gtest.h>
 
-#include "hbase/if/Client.pb.h"
+#include "client/Client.pb.h"
 #include "hbase/serde/rpc-serde.h"
 
 using namespace hbase;
