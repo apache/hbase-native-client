@@ -34,7 +34,7 @@ include(CheckCXXCompilerFlag)
 
 
 option(DOWNLOAD_DEPENDENCIES "Downloads and builds all dependencies locally " OFF)
-option(HBASE_TARGET_TAG "HBase tag to be used if HBASE_HOME is not set" "e5345b3a7c32c6a80394319c17540b84c8fe66ba")
+option(HBASE_TARGET_TAG "HBase tag to be used if HBASE_HOME is not set" "master")
 option(HBASE_HOME "Path to HBase" "")
 option(BUILD_HBASE "Build HBASE_HOME path if it is provided" OFF)
 	

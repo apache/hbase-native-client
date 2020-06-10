@@ -33,8 +33,10 @@ simple-client
 # CMake temporary files
 CMakeCache.txt
 CMakeFiles
-#*.cmake
 Makefile
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
 
 # Copied from hbase-common at build-time
 include/hbase/utils/version.h
