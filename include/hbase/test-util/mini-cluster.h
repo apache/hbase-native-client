@@ -25,6 +25,9 @@
 
 namespace hbase {
 
+/**
+ * JNI wrapper for the Java based mini cluster implementation.
+ */
 class MiniCluster {
  public:
   virtual ~MiniCluster();
@@ -43,7 +46,7 @@ class MiniCluster {
   // returns the Configuration instance for the cluster
   jobject GetConf();
   // returns the value for config key retrieved from cluster
-  const std::string GetConfValue(const std::string &key);
+  std::string GetConfValue(const std::string &key);
 
  private:
   JNIEnv *env_;
@@ -78,5 +81,7 @@ class MiniCluster {
   JNIEnv *env();
   jbyteArray StrToByteChar(const std::string &str);
   jobject admin();
+  // Util to get a global ref so that the objected is not GC'ed
+  jclass FindClassAndGetGlobalRef(const char* cls_name);
 };
 } /*namespace hbase*/
