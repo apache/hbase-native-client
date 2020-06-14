@@ -37,11 +37,6 @@ class TestUtil {
   TestUtil();
 
   /**
-   * Destroying a TestUtil will spin down a cluster and remove the test dir.
-   */
-  ~TestUtil();
-
-  /**
    * Create a random string. This random string is all letters, as such it is
    * very good for use as a directory name.
    */
