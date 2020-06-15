@@ -18,56 +18,18 @@
  */
 #pragma once
 
-#include <folly/Random.h>
-#include <folly/experimental/TestUtil.h>
-
-#include <cstdlib>
-#include <memory>
-#include <string>
-#include <vector>
-#include "hbase/client/configuration.h"
-#include "hbase/test-util/mini-cluster.h"
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+#include <gtest/gtest.h>
 
 namespace hbase {
-/**
- * @brief Class to deal with a local instance cluster for testing.
- */
-class TestUtil {
- public:
-  TestUtil();
-
-  /**
-   * Create a random string. This random string is all letters, as such it is
-   * very good for use as a directory name.
-   */
-  static std::string RandString(int len = 32);
-
-  /**
-   * Returns the configuration to talk to the local cluster
-   */
-  std::shared_ptr<Configuration> conf() const { return conf_; }
-
-  /**
-   * Starts mini hbase cluster with specified number of region servers
-   */
-  void StartMiniCluster(int32_t num_region_servers);
-
-  void StopMiniCluster();
-  void CreateTable(const std::string &table, const std::string &family);
-  void CreateTable(const std::string &table, const std::vector<std::string> &families);
-  void CreateTable(const std::string &table, const std::string &family,
-                   const std::vector<std::string> &keys);
-  void CreateTable(const std::string &table, const std::vector<std::string> &families,
-                   const std::vector<std::string> &keys);
-
-  void StartStandAloneInstance();
-  void StopStandAloneInstance();
-  void RunShellCmd(const std::string &);
-  void MoveRegion(const std::string &region, const std::string &server);
-
- private:
-  std::unique_ptr<MiniCluster> mini_;
-  folly::test::TemporaryDirectory temp_dir_;
-  std::shared_ptr<Configuration> conf_ = std::make_shared<Configuration>();
-};
-}  // namespace hbase
+// main() function intended to be used in tests. This initializes the needed gflags/glog libraries as needed.
+#define HBASE_TEST_MAIN() \
+  int main(int argc, char** argv) { \
+    ::testing::InitGoogleTest(&argc, argv); \
+    gflags::ParseCommandLineFlags(&argc, &argv, true);\
+    google::InstallFailureSignalHandler();\
+    google::InitGoogleLogging(argv[0]);\
+    return RUN_ALL_TESTS(); \
+  }
+} // namespace hbase

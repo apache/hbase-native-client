@@ -22,7 +22,6 @@
 #include <folly/futures/Future.h>
 #include <folly/io/async/EventBase.h>
 #include <folly/io/async/ScopedEventBaseThread.h>
-#include <gtest/gtest.h>
 #include <wangle/concurrent/IOThreadPoolExecutor.h>
 
 #include <chrono>
@@ -39,6 +38,7 @@
 #include "hbase/client/region-location.h"
 #include "hbase/client/result.h"
 #include "hbase/exceptions/exception.h"
+#include "hbase/test-util/mini-cluster-util.h"
 #include "hbase/test-util/test-util.h"
 #include "hbase/utils/time-util.h"
 
@@ -67,12 +67,11 @@ using folly::exception_wrapper;
 
 class AsyncBatchRpcRetryTest : public ::testing::Test {
  public:
-  static std::unique_ptr<hbase::TestUtil> test_util;
+  static std::unique_ptr<hbase::MiniClusterUtility> test_util;
   static std::string tableName;
 
   static void SetUpTestCase() {
-    google::InstallFailureSignalHandler();
-    test_util = std::make_unique<hbase::TestUtil>();
+    test_util = std::make_unique<hbase::MiniClusterUtility>();
     test_util->StartMiniCluster(2);
     std::vector<std::string> keys{"test0",   "test100", "test200", "test300", "test400",
                                   "test500", "test600", "test700", "test800", "test900"};
@@ -80,7 +79,7 @@ class AsyncBatchRpcRetryTest : public ::testing::Test {
     test_util->CreateTable(tableName, "d", keys);
   }
 };
-std::unique_ptr<hbase::TestUtil> AsyncBatchRpcRetryTest::test_util = nullptr;
+std::unique_ptr<hbase::MiniClusterUtility> AsyncBatchRpcRetryTest::test_util = nullptr;
 std::string AsyncBatchRpcRetryTest::tableName;
 
 class AsyncRegionLocatorBase : public AsyncRegionLocator {
@@ -575,3 +574,5 @@ TEST_F(AsyncBatchRpcRetryTest, PutsFailWithOperationTimeout) {
  std::make_shared<MockFailingAsyncRegionLocator>(6));
  EXPECT_ANY_THROW(runMultiGets(region_locator, "table12", true, 5, 100, 1000));
  }
+
+ HBASE_TEST_MAIN()

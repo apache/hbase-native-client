@@ -18,11 +18,14 @@
  */
 
 #include "hbase/test-util/mini-cluster.h"
-#include <fcntl.h>
 #include <glog/logging.h>
+#include <boost/dll/runtime_symbol_info.hpp>
+#include <boost/filesystem.hpp>
 #include <fstream>
 
 using hbase::MiniCluster;
+using boost::dll::program_location;
+using boost::filesystem::path;
 using std::ifstream;
 using std::lock_guard;
 using std::mutex;
@@ -40,25 +43,29 @@ JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
   char *classpath = getenv("CLASSPATH");
   // Copy it to a string so that we don't inadverdently change the environment variable.
   string final_classpath;
-  if (classpath == nullptr || strstr(classpath, "-tests.jar") == nullptr) {
-    if (classpath != nullptr) {
-      final_classpath.assign(classpath);
-    }
+  if (classpath && strstr(classpath, "-tests.jar")) {
+    final_classpath.assign(classpath);
+  } else {
     // Default classpath loaded from downloaded HBase src (paths defined in CMakeLists.txt)
-    string clspath_file_path("./apachehbase-src/hbase-build-configuration/target/cached_classpath.txt");
-    ifstream fd(clspath_file_path);
+    const string relative_cached_classpath(
+        "../dependencies/apache-hbase-src/hbase-build-configuration/target/cached_classpath.txt");
+    const string cls_path_file_path =
+        program_location().parent_path().append(relative_cached_classpath).generic_string();
+    LOG(INFO) << "Attempting to load default classpath from file: " << cls_path_file_path;
+    ifstream fd(cls_path_file_path);
     if (!fd.is_open()) {
-      LOG(FATAL) << "No valid classpath found. If you haven't built with DOWNLOAD_DEPENDENCIES=ON, set the appropriate"
-                    "CLASSPATH variable pointing to the content of cached_classpath.txt generated from compiling HBase"
+      LOG(FATAL) << "No valid classpath found. If you haven't built with DOWNLOAD_DEPENDENCIES=ON, set the appropriate "
+                    "CLASSPATH variable pointing to the content of cached_classpath.txt generated from compiling HBase "
                     "sources.";
     }
     string file_contents;
     getline(fd, file_contents);
     if (file_contents.empty()) {
-      LOG(FATAL) << "Empty classpath file encountered: " << clspath_file_path;
+      LOG(FATAL) << "Empty classpath file encountered: " << cls_path_file_path;
     }
     final_classpath.append(":" + file_contents);
   }
+  LOG(INFO) << "Using classpath: " << final_classpath;
   auto options = string{"-Djava.class.path="} + final_classpath;
   jvm_options.optionString = const_cast<char *>(options.c_str());
   args.options = &jvm_options;

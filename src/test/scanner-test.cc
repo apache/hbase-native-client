@@ -18,7 +18,6 @@
  */
 
 #include <folly/Conv.h>
-#include <gtest/gtest.h>
 
 #include <chrono>
 #include <thread>
@@ -39,6 +38,7 @@
 #include "client/Comparator.pb.h"
 #include "client/Filter.pb.h"
 #include "hbase/serde/table-name.h"
+#include "hbase/test-util/mini-cluster-util.h"
 #include "hbase/test-util/test-util.h"
 #include "hbase/utils/time-util.h"
 
@@ -51,7 +51,7 @@ using hbase::Put;
 using hbase::Result;
 using hbase::Scan;
 using hbase::Table;
-using hbase::TestUtil;
+using hbase::MiniClusterUtility;
 using hbase::TimeUtil;
 using hbase::AsyncClientScanner;
 using hbase::AsyncTableResultScanner;
@@ -60,16 +60,16 @@ using hbase::pb::CompareType;
 
 class ScannerTest : public ::testing::Test {
  public:
-  static std::unique_ptr<hbase::TestUtil> test_util;
+  static std::unique_ptr<hbase::MiniClusterUtility> test_util;
   static const uint32_t num_rows;
 
   static void SetUpTestCase() {
     google::InstallFailureSignalHandler();
-    test_util = std::make_unique<hbase::TestUtil>();
+    test_util = std::make_unique<hbase::MiniClusterUtility>();
     test_util->StartMiniCluster(2);
   }
 };
-std::unique_ptr<hbase::TestUtil> ScannerTest::test_util = nullptr;
+std::unique_ptr<hbase::MiniClusterUtility> ScannerTest::test_util = nullptr;
 const uint32_t ScannerTest::num_rows = 1000;
 
 std::string Family(uint32_t i) { return "f" + folly::to<std::string>(i); }
@@ -366,3 +366,5 @@ TEST_F(ScannerTest, ScanNoResults) {
 
   TestScan(scan, 0, 0, table.get());
 }
+
+HBASE_TEST_MAIN()

@@ -16,9 +16,8 @@
  * limitations under the License.
  *
  */
-#include <gtest/gtest.h>
-
 #include "hbase/client/zk-util.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::Configuration;
 using hbase::ZKUtil;
@@ -48,3 +47,5 @@ TEST(ZKUtilTest, MetaZNode) {
   conf.Set(ZKUtil::kHBaseZnodeParent_, "/hbase-secure");
   ASSERT_EQ("/hbase-secure/meta-region-server", ZKUtil::MetaZNode(conf));
 }
+
+HBASE_TEST_MAIN()

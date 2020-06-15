@@ -17,8 +17,6 @@
  *
  */
 
-#include <gtest/gtest.h>
-
 #include <fstream>
 #include "hbase/client/append.h"
 #include "hbase/client/cell.h"
@@ -33,6 +31,7 @@
 #include "hbase/client/table.h"
 #include "hbase/exceptions/exception.h"
 #include "hbase/serde/table-name.h"
+#include "hbase/test-util/mini-cluster-util.h"
 #include "hbase/test-util/test-util.h"
 #include "hbase/utils/bytes-util.h"
 #include "hbase/utils/optional.h"
@@ -44,7 +43,7 @@ using hbase::RetriesExhaustedException;
 using hbase::none;
 using hbase::Put;
 using hbase::Table;
-using hbase::TestUtil;
+using hbase::MiniClusterUtility;
 
 class ClientTest : public ::testing::Test {
  protected:
@@ -93,15 +92,15 @@ class ClientTest : public ::testing::Test {
     // the hbase-site.xml would be persisted by MiniCluster
     setenv("HBASE_CONF", kDefHBaseConfPath, 1);
   }
-  static std::unique_ptr<hbase::TestUtil> test_util;
+  static std::unique_ptr<hbase::MiniClusterUtility> test_util;
 
   static void SetUpTestCase() {
     google::InstallFailureSignalHandler();
-    test_util = std::make_unique<hbase::TestUtil>();
+    test_util = std::make_unique<hbase::MiniClusterUtility>();
     test_util->StartMiniCluster(2);
   }
 };
-std::unique_ptr<hbase::TestUtil> ClientTest::test_util = nullptr;
+std::unique_ptr<hbase::MiniClusterUtility> ClientTest::test_util = nullptr;
 
 TEST_F(ClientTest, EmptyConfigurationPassedToClient) { ASSERT_ANY_THROW(hbase::Client client); }
 
@@ -701,3 +700,5 @@ TEST_F(ClientTest, MultiPutsWithRegionSplits) {
   table->Close();
   client.Close();
 }
+
+HBASE_TEST_MAIN()

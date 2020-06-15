@@ -18,9 +18,9 @@
  */
 
 #include <folly/Logging.h>
-#include <gtest/gtest.h>
 #include <string>
 
+#include "hbase/test-util/test-util.h"
 #include "hbase/utils/concurrent-map.h"
 
 using hbase::concurrent_map;
@@ -34,3 +34,5 @@ TEST(TestConcurrentMap, TestFindAndErase) {
 
   ASSERT_EQ(map.end(), map.find("foo"));
 }
+
+HBASE_TEST_MAIN()

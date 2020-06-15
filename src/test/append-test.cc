@@ -17,11 +17,11 @@
  *
  */
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 
 #include "hbase/client/append.h"
 #include "hbase/client/mutation.h"
 #include "hbase/utils/time-util.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::Append;
 using hbase::Cell;
@@ -103,3 +103,5 @@ TEST(Append, Add) {
   EXPECT_EQ(2, append.FamilyMap().size());
   EXPECT_EQ(1, append.FamilyMap().at("family-2").size());
 }
+
+HBASE_TEST_MAIN()

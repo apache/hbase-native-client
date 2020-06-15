@@ -18,7 +18,8 @@
  */
 
 #include "hbase/client/configuration.h"
-#include <gtest/gtest.h>
+
+#include "hbase/test-util/test-util.h"
 
 using hbase::Configuration;
 
@@ -117,3 +118,5 @@ TEST(Configuration, SetGetBoolBasic) {
   conf.SetInt("foo", true);
   EXPECT_EQ(conf.GetInt("foo", false), true);
 }
+
+HBASE_TEST_MAIN()

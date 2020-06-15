@@ -19,12 +19,11 @@
 
 #include "hbase/serde/region-info.h"
 
-#include <gtest/gtest.h>
-
 #include <string>
 
 #include "hbase/if/HBase.pb.h"
 #include "hbase/serde/table-name.h"
+#include "hbase/test-util/test-util.h"
 
 using std::string;
 using hbase::pb::RegionInfo;
@@ -51,3 +50,5 @@ TEST(TestRegionInfoDesializer, TestDeserialize) {
 
   EXPECT_EQ(region_id, out.region_id());
 }
+
+HBASE_TEST_MAIN()

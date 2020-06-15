@@ -18,7 +18,6 @@
  */
 
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 #include <limits>
 #include <memory>
 #include <string>
@@ -26,6 +25,7 @@
 
 #include "hbase/client/cell.h"
 #include "hbase/client/result.h"
+#include "hbase/test-util/test-util.h"
 #include "hbase/utils/optional.h"
 
 using hbase::Cell;
@@ -321,3 +321,5 @@ TEST(Result, ResultEstimatedSize) {
   LOG(INFO) << result1.EstimatedSize();
   LOG(INFO) << result2.EstimatedSize();
 }
+
+HBASE_TEST_MAIN()

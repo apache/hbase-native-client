@@ -18,10 +18,10 @@
  */
 
 #include <folly/Logging.h>
-#include <gtest/gtest.h>
 #include <string>
 
 #include "hbase/utils/user-util.h"
+#include "hbase/test-util/test-util.h"
 
 using namespace std;
 using namespace hbase;
@@ -33,3 +33,5 @@ TEST(TestUserUtil, TestGetSomething) {
   // TODO shell out to whoami to check this.
   ASSERT_GT(name.length(), 0);
 }
+
+HBASE_TEST_MAIN()

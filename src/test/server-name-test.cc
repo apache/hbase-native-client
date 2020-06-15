@@ -17,10 +17,10 @@
  *
  */
 
-#include "hbase/serde/server-name.h"
-
-#include <gtest/gtest.h>
 #include <string>
+
+#include "hbase/serde/server-name.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::pb::ServerName;
 
@@ -45,3 +45,5 @@ TEST(TestServerName, TestIPV6) {
   ASSERT_EQ("[::::1]", sn.host_name());
   ASSERT_EQ(123, sn.port());
 }
+
+HBASE_TEST_MAIN()

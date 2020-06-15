@@ -19,13 +19,13 @@
 
 #include <folly/Conv.h>
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 
 #include <vector>
 
 #include "hbase/client/cell.h"
 #include "hbase/client/result.h"
 #include "hbase/client/scan-result-cache.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::ScanResultCache;
 using hbase::Result;
@@ -175,3 +175,5 @@ TEST(ScanResultCacheTest, SizeOf) {
   LOG(INFO) << sizeof(f) << " " << f.capacity();
   LOG(INFO) << sizeof(foo) << " " << foo.capacity();
 }
+
+HBASE_TEST_MAIN()
