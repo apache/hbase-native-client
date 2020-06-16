@@ -20,23 +20,18 @@
 ## BUILD_DIR is the build directory, typically 'build'
 
 function(download_folly SOURCE_DIR BUILD_DIR)
-
-	
-	ExternalProject_Add(
-		facebook-folly-proj
-		URL "https://github.com/facebook/folly/archive/v2017.09.04.00.tar.gz"
-		#GIT_REPOSITORY "https://github.com/facebook/folly.git"
-		#GIT_TAG "v2017.09.04.00"
-		SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"
-		BINARY_DIR ${BUILD_DIR}/dependencies/facebook-folly-proj-src/folly
-		CONFIGURE_COMMAND autoreconf -ivf
-			COMMAND ./configure  --prefix=${BUILD_DIR}/dependencies/facebook-folly-proj-install
-			"CFLAGS=-fPIC -lboost_context -lboost_coroutine -ldl" ## this version of folly does not support cmake so we must pass args manually
-  			"CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC -lboost_context -lboost_coroutine -ldl" ## this version of folly does not support cmake so we must pass args manually
-		UPDATE_COMMAND ""
-		)
-
-
-	set(FOLLY_ROOT_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-install" CACHE STRING "" FORCE)
-	
+  ExternalProject_Add(
+      facebook-folly-proj
+      # TODO: Source version information from cmake file.
+      URL "https://github.com/facebook/folly/archive/v2017.09.04.00.tar.gz"
+      PREFIX "${BUILD_DIR}/dependencies"
+      SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"
+      BINARY_DIR ${BUILD_DIR}/dependencies/facebook-folly-proj-src/folly
+      CONFIGURE_COMMAND autoreconf -ivf
+      COMMAND ./configure  --prefix=${BUILD_DIR}/dependencies/facebook-folly-proj-install
+          "CFLAGS=-fPIC -lboost_context -lboost_coroutine -ldl" ## this version of folly does not support cmake so we must pass args manually
+  	   "CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC -lboost_context -lboost_coroutine -ldl" ## this version of folly does not support cmake so we must pass args manually
+      UPDATE_COMMAND ""
+  )
+  set(FOLLY_ROOT_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-install" CACHE STRING "" FORCE)
 endfunction(download_folly) 

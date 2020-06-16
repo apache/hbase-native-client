@@ -22,22 +22,18 @@
 #################### ZOOKEEPER
 
 function(download_zookeeper SOURCE_DIR BUILD_DIR)
-
-	ExternalProject_Add(
-	  ZooKeeper
-	  URL "https://archive.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz"
-	  SOURCE_DIR "${BUILD_DIR}/dependencies/zookeeper-src"
-	  BINARY_DIR ${BUILD_DIR}/dependencies/zookeeper-src/src/c/
-	  CONFIGURE_COMMAND ./configure --without-cppunit --prefix=${BUILD_DIR}/dependencies/zookeeper-install
-	  PATCH_COMMAND patch ${BUILD_DIR}/dependencies/zookeeper-src/src/c/src/zookeeper.c ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/zookeeper.3.4.x.buf
-	  UPDATE_COMMAND ""
-	)
-	
-	add_library(zookeeper STATIC IMPORTED)
-	set_target_properties(zookeeper PROPERTIES IMPORTED_LOCATION "${BUILD_DIR}/dependencies/zookeeper-install/lib/libzookeeper_mt.a")
-	add_dependencies(zookeeper ZooKeeper)
-	
-	set(ZOOKEEPER_DIR "${BUILD_DIR}/dependencies/zookeeper-install/" CACHE STRING "" FORCE)
-	
-		
+  ExternalProject_Add(
+      ZooKeeper
+      URL "https://archive.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz"
+      PREFIX "${BUILD_DIR}/dependencies"
+      SOURCE_DIR "${BUILD_DIR}/dependencies/zookeeper-src"
+      BINARY_DIR ${BUILD_DIR}/dependencies/zookeeper-src/src/c/
+      CONFIGURE_COMMAND ./configure --without-cppunit --prefix=${BUILD_DIR}/dependencies/zookeeper-install
+      PATCH_COMMAND patch ${BUILD_DIR}/dependencies/zookeeper-src/src/c/src/zookeeper.c ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/zookeeper.3.4.x.buf
+      UPDATE_COMMAND ""
+  )
+  add_library(zookeeper STATIC IMPORTED)
+  set_target_properties(zookeeper PROPERTIES IMPORTED_LOCATION "${BUILD_DIR}/dependencies/zookeeper-install/lib/libzookeeper_mt.a")
+  add_dependencies(zookeeper ZooKeeper)
+  set(ZOOKEEPER_DIR "${BUILD_DIR}/dependencies/zookeeper-install/" CACHE STRING "" FORCE)
 endfunction(download_zookeeper)
