@@ -26,7 +26,8 @@
 namespace hbase {
 
 /**
- * JNI wrapper for the Java based mini cluster implementation.
+ * JNI wrapper for the Java based mini cluster implementation. StartCluster() must be called before calling any other
+ * methods that operate on the JVM, otherwise it triggers an assert that results in a crash.
  */
 class MiniCluster {
  public:
@@ -39,8 +40,6 @@ class MiniCluster {
                       const std::vector<std::string> &keys);
   jobject CreateTable(const std::string &table, const std::vector<std::string> &families,
                       const std::vector<std::string> &keys);
-  jobject StopRegionServer(int idx);
-
   // moves region to server
   void MoveRegion(const std::string &region, const std::string &server);
   // returns the Configuration instance for the cluster
@@ -73,12 +72,13 @@ class MiniCluster {
   jmethodID str_ctor_mid_;
   jobject htu_;
   jobject cluster_;
-  std::mutex count_mutex_;
+  // Mutex to be acquired to make changes to the cluster state (start/stop).
+  std::mutex lock_;
+  // To make Setup() calls idempotent.
+  bool inited_ = false;
   JavaVM *jvm_;
   JNIEnv *CreateVM(JavaVM **jvm);
   void Setup();
-  jobject htu();
-  JNIEnv *env();
   jbyteArray StrToByteChar(const std::string &str);
   jobject admin();
   // Util to get a global ref so that the objected is not GC'ed

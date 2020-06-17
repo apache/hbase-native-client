@@ -23,8 +23,11 @@
 #include <fstream>
 
 using hbase::MiniCluster;
-using std::string;
 using std::ifstream;
+using std::lock_guard;
+using std::mutex;
+using std::string;
+using std::vector;
 
 JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
   JavaVMInitArgs args;
@@ -56,7 +59,7 @@ JNIEnv *MiniCluster::CreateVM(JavaVM **jvm) {
     }
     final_classpath.append(":" + file_contents);
   }
-  auto options = std::string{"-Djava.class.path="} + final_classpath;
+  auto options = string{"-Djava.class.path="} + final_classpath;
   jvm_options.optionString = const_cast<char *>(options.c_str());
   args.options = &jvm_options;
   args.ignoreUnrecognized = 0;
@@ -70,6 +73,7 @@ MiniCluster::~MiniCluster() {
   if (!env_) {
     return;
   }
+  StopCluster();
   // Clean up the global references.
   if (testing_util_class_) {
     env_->DeleteGlobalRef(testing_util_class_);
@@ -93,7 +97,8 @@ MiniCluster::~MiniCluster() {
 }
 
 void MiniCluster::Setup() {
-  std::lock_guard<std::mutex> lock(count_mutex_);
+  lock_guard<mutex> lock(lock_);
+  if (inited_) return;
   if (!env_) {
     env_ = CreateVM(&jvm_);
     CHECK_NOTNULL(env_);
@@ -162,19 +167,11 @@ void MiniCluster::Setup() {
   if (add_col_mid_ == nullptr) {
     LOG(FATAL) << "Couldn't find method addColumn";
   }
+  inited_ = true;
 }
 
-jobject MiniCluster::htu() {
-  Setup();
-  return htu_;
-}
-
-JNIEnv *MiniCluster::env() {
-  Setup();
-  return env_;
-}
 // converts C char* to Java byte[]
-jbyteArray MiniCluster::StrToByteChar(const std::string &str) {
+jbyteArray MiniCluster::StrToByteChar(const string &str) {
   if (str.length() == 0) {
     return nullptr;
   }
@@ -184,7 +181,7 @@ jbyteArray MiniCluster::StrToByteChar(const std::string &str) {
   return arr;
 }
 
-jobject MiniCluster::CreateTable(const std::string &table, const std::string &family) {
+jobject MiniCluster::CreateTable(const string &table, const string &family) {
   jstring table_name_str = env_->NewStringUTF(table.c_str());
   jobject table_name =
       env_->CallStaticObjectMethod(table_name_class_, tbl_name_value_of_mid_, table_name_str);
@@ -193,8 +190,7 @@ jobject MiniCluster::CreateTable(const std::string &table, const std::string &fa
   return table_obj;
 }
 
-jobject MiniCluster::CreateTable(const std::string &table,
-                                 const std::vector<std::string> &families) {
+jobject MiniCluster::CreateTable(const string &table, const vector<string> &families) {
   jstring table_name_str = env_->NewStringUTF(table.c_str());
   jobject table_name =
       env_->CallStaticObjectMethod(table_name_class_, tbl_name_value_of_mid_, table_name_str);
@@ -209,15 +205,15 @@ jobject MiniCluster::CreateTable(const std::string &table,
   return table_obj;
 }
 
-jobject MiniCluster::CreateTable(const std::string &table, const std::string &family,
-                                 const std::vector<std::string> &keys) {
-  std::vector<std::string> families{};
+jobject MiniCluster::CreateTable(const string &table, const string &family,
+                                 const vector<string> &keys) {
+  vector<string> families{};
   families.emplace_back(family);
   return CreateTable(table, families, keys);
 }
 
-jobject MiniCluster::CreateTable(const std::string &table, const std::vector<std::string> &families,
-                                 const std::vector<std::string> &keys) {
+jobject MiniCluster::CreateTable(const string &table, const vector<string> &families,
+                                 const vector<string> &keys) {
   jstring table_name_str = env_->NewStringUTF(table.c_str());
   jobject table_name =
       env_->CallStaticObjectMethod(table_name_class_, tbl_name_value_of_mid_, table_name_str);
@@ -225,14 +221,14 @@ jobject MiniCluster::CreateTable(const std::string &table, const std::vector<std
 
   int i = 0;
   jobjectArray family_array = env_->NewObjectArray(families.size(), array_element_type, nullptr);
-  for (auto family : families) {
+  for (const auto& family : families) {
     env_->SetObjectArrayElement(family_array, i++, StrToByteChar(family));
   }
 
   jobjectArray key_array = env_->NewObjectArray(keys.size(), array_element_type, nullptr);
 
   i = 0;
-  for (auto key : keys) {
+  for (const auto& key : keys) {
     env_->SetObjectArrayElement(key_array, i++, StrToByteChar(key));
   }
 
@@ -241,53 +237,40 @@ jobject MiniCluster::CreateTable(const std::string &table, const std::vector<std
   return tbl;
 }
 
-jobject MiniCluster::StopRegionServer(int idx) {
-  env();
-  return env_->CallObjectMethod(cluster_, stop_rs_mid_, (jint)idx);
-}
-
 // returns the Configuration for the cluster
 jobject MiniCluster::GetConf() {
-  env();
+  CHECK_NOTNULL(env_);
   return env_->CallObjectMethod(cluster_, get_conf_mid_);
 }
 // return the Admin instance for the local cluster
 jobject MiniCluster::admin() {
-  env();
-  jobject conn = env_->CallObjectMethod(htu(), get_conn_mid_);
+  CHECK_NOTNULL(env_);
+  jobject conn = env_->CallObjectMethod(htu_, get_conn_mid_);
   jobject admin = env_->CallObjectMethod(conn, get_admin_mid_);
   return admin;
 }
 
 // moves region to server
-void MiniCluster::MoveRegion(const std::string &region, const std::string &server) {
+void MiniCluster::MoveRegion(const string &region, const string &server) {
+  CHECK_NOTNULL(env_);
   jobject admin_ = admin();
   env_->CallObjectMethod(admin_, move_mid_, StrToByteChar(region), StrToByteChar(server));
 }
 
 jobject MiniCluster::StartCluster(int num_region_servers) {
-  env();
+  Setup();
+  CHECK_NOTNULL(env_);
   jmethodID mid = env_->GetMethodID(testing_util_class_, "startMiniCluster",
       "(I)Lorg/apache/hadoop/hbase/MiniHBaseCluster;");
   if (mid == nullptr) {
     LOG(INFO) << "Couldn't find method startMiniCluster in the class HBaseTestingUtility";
     exit(-1);
   }
-  cluster_ = env_->CallObjectMethod(htu(), mid, static_cast<jint>(num_region_servers));
+  cluster_ = env_->CallObjectMethod(htu_, mid, static_cast<jint>(num_region_servers));
   return cluster_;
 }
 
-void MiniCluster::StopCluster() {
-  env();
-  jmethodID mid = env_->GetMethodID(testing_util_class_, "shutdownMiniCluster", "()V");
-  env_->CallVoidMethod(htu(), mid);
-  if (jvm_ != nullptr) {
-    jvm_->DestroyJavaVM();
-    jvm_ = nullptr;
-  }
-}
-
-std::string MiniCluster::GetConfValue(const std::string &key) {
+string MiniCluster::GetConfValue(const string &key) {
   jobject conf = GetConf();
   auto jval =
       (jstring)env_->CallObjectMethod(conf, conf_get_mid_, env_->NewStringUTF(key.c_str()));
@@ -305,4 +288,15 @@ jclass hbase::MiniCluster::FindClassAndGetGlobalRef(const char *cls_name) {
   jobject global_ref = env_->NewGlobalRef(local_ref);
   env_->DeleteLocalRef(local_ref);
   return static_cast<jclass>(global_ref);
+}
+
+void hbase::MiniCluster::StopCluster() {
+  CHECK_NOTNULL(env_);
+  lock_guard<mutex> lock(lock_);
+  if (testing_util_class_ && htu_) {
+    LOG(INFO) << "Shutting down mini cluster.";
+    // Clean up the test cluster.
+    jmethodID mid = env_->GetMethodID(testing_util_class_, "shutdownMiniCluster", "()V");
+    env_->CallVoidMethod(htu_, mid);
+  }
 }
