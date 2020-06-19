@@ -28,7 +28,6 @@
 #include <folly/io/async/AsyncSocketException.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <chrono>
 
@@ -38,6 +37,7 @@
 #include "hbase/connection/rpc-test-server.h"
 #include "hbase/security/user.h"
 #include "hbase/serde/rpc-serde.h"
+#include "hbase/test-util/test-util.h"
 
 using namespace wangle;
 using namespace folly;
@@ -282,3 +282,5 @@ TEST_F(RpcTest, Pause) {
   server->stop();
   server->join();
 }
+
+HBASE_TEST_MAIN()

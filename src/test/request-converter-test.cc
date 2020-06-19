@@ -19,11 +19,11 @@
 
 #include "hbase/client/request-converter.h"
 
-#include <gtest/gtest.h>
 #include <limits>
 #include "hbase/connection/request.h"
 #include "hbase/client/get.h"
 #include "hbase/client/scan.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::Get;
 using hbase::Scan;
@@ -124,3 +124,5 @@ TEST(RequestConverter, ToScan) {
   ASSERT_FALSE(msg->client_handles_heartbeats());
   ASSERT_FALSE(msg->track_scan_metrics());
 }
+
+HBASE_TEST_MAIN()

@@ -16,11 +16,11 @@
  * limitations under the License.
  *
  */
-#include <gtest/gtest.h>
 
 #include "hbase/exceptions/exception.h"
 
 #include "folly/ExceptionWrapper.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::ExceptionUtil;
 using hbase::IOException;
@@ -62,3 +62,5 @@ TEST(ExceptionUtilTest, RemoteExceptionShouldRetry) {
   ex.set_exception_class_name("org.apache.hadoop.hbase.UnknownRegionException");
   EXPECT_FALSE(ExceptionUtil::ShouldRetry(ex));
 }
+
+HBASE_TEST_MAIN()

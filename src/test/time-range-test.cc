@@ -18,9 +18,9 @@
  */
 
 #include "hbase/client/time-range.h"
+#include "hbase/test-util/test-util.h"
 
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 
 using namespace hbase;
 
@@ -46,3 +46,5 @@ TEST(TimeRange, Exception) {
   // Min TS > Max TS
   ASSERT_THROW(TimeRange(10000, 2000), std::runtime_error);
 }
+
+HBASE_TEST_MAIN()

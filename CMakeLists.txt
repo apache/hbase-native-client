@@ -159,13 +159,15 @@ if (DOWNLOAD_DEPENDENCIES)
   download_zookeeper(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif(DOWNLOAD_DEPENDENCIES)
 
+set(BOOST_MIN_VERSION "1.6.1")
+
 # ensure we have required dependencies
 find_package(Threads)
-find_package(Boost REQUIRED COMPONENTS context thread system filesystem regex)
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS context thread system filesystem regex)
 find_package(LibEvent REQUIRED)
 find_package(Gflags REQUIRED)
 if (DOWNLOAD_DEPENDENCIES)
-	find_package(Sodium REQUIRED)
+  find_package(Sodium REQUIRED)
 endif(DOWNLOAD_DEPENDENCIES)
 find_package(Folly REQUIRED)
 find_package(Krb5 REQUIRED)

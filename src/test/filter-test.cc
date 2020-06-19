@@ -17,7 +17,6 @@
  *
  */
 
-#include <gtest/gtest.h>
 #include "hbase/client/client.h"
 #include "hbase/client/configuration.h"
 #include "hbase/client/get.h"
@@ -27,6 +26,7 @@
 #include "client/Comparator.pb.h"
 #include "HBase.pb.h"
 #include "hbase/serde/table-name.h"
+#include "hbase/test-util/mini-cluster-util.h"
 #include "hbase/test-util/test-util.h"
 
 using hbase::Configuration;
@@ -34,7 +34,7 @@ using hbase::Get;
 using hbase::Put;
 using hbase::FilterFactory;
 using hbase::Table;
-using hbase::TestUtil;
+using hbase::MiniClusterUtility;
 using hbase::pb::CompareType;
 using hbase::ComparatorFactory;
 using hbase::Comparator;
@@ -42,7 +42,7 @@ using hbase::Comparator;
 class FilterTest : public ::testing::Test {
  protected:
   static void SetUpTestCase() {
-    test_util_ = std::make_unique<TestUtil>();
+    test_util_ = std::make_unique<MiniClusterUtility>();
     test_util_->StartMiniCluster(2);
   }
 
@@ -51,10 +51,10 @@ class FilterTest : public ::testing::Test {
   virtual void SetUp() {}
   virtual void TearDown() {}
 
-  static std::unique_ptr<TestUtil> test_util_;
+  static std::unique_ptr<MiniClusterUtility> test_util_;
 };
 
-std::unique_ptr<TestUtil> FilterTest::test_util_ = nullptr;
+std::unique_ptr<MiniClusterUtility> FilterTest::test_util_ = nullptr;
 
 TEST_F(FilterTest, GetWithColumnPrefixFilter) {
   // write row1 with 3 columns (column_1, column_2, and foo_column)
@@ -139,3 +139,5 @@ TEST_F(FilterTest, GetWithQualifierFilter) {
   EXPECT_EQ("value2", *(result->Value("d", "b")));
   EXPECT_EQ("value3", *(result->Value("d", "c")));
 }
+
+HBASE_TEST_MAIN()

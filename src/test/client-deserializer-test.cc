@@ -17,10 +17,10 @@
  *
  */
 #include <folly/io/IOBuf.h>
-#include <gtest/gtest.h>
 
 #include "client/Client.pb.h"
 #include "hbase/serde/rpc-serde.h"
+#include "hbase/test-util/test-util.h"
 
 using namespace hbase;
 using folly::IOBuf;
@@ -62,3 +62,5 @@ TEST(TestRpcSerde, TestGoodGetRequestFullRoundTrip) {
   ASSERT_GT(used_bytes, 0);
   ASSERT_EQ(used_bytes, buf->length());
 }
+
+HBASE_TEST_MAIN()

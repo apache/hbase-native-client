@@ -21,10 +21,10 @@
 #include <iostream>
 
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 #include "hbase/client/configuration.h"
 #include "hbase/client/hbase-configuration-loader.h"
+#include "hbase/test-util/test-util.h"
 #include "hbase/utils/optional.h"
 
 using namespace hbase;
@@ -373,3 +373,5 @@ TEST(Configuration, GetBoolException) {
   ASSERT_TRUE(conf != none) << "No configuration object present.";
   ASSERT_THROW((*conf).GetBool("bool.exception", false), std::runtime_error);
 }
+
+HBASE_TEST_MAIN()

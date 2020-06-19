@@ -22,9 +22,10 @@
 #include <folly/Logging.h>
 #include <folly/io/Cursor.h>
 #include <folly/io/IOBuf.h>
-#include <gtest/gtest.h>
 
 #include "server/zookeeper/ZooKeeper.pb.h"
+
+#include "hbase/test-util/test-util.h"
 
 using namespace hbase;
 using namespace hbase::pb;
@@ -121,3 +122,5 @@ TEST(TestZkDesializer, TestNoThrow) {
   ASSERT_TRUE(deser.Parse(buf.get(), &out));
   ASSERT_EQ(mrs.server().host_name(), out.server().host_name());
 }
+
+HBASE_TEST_MAIN()

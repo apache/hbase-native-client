@@ -18,11 +18,11 @@
  */
 
 #include <folly/Conv.h>
-#include <gtest/gtest.h>
 
 #include <string>
 
 #include "hbase/serde/table-name.h"
+#include "hbase/test-util/test-util.h"
 
 using namespace hbase;
 using hbase::pb::TableName;
@@ -52,3 +52,5 @@ TEST(TestTableName, TestToStringIncludeNS) {
   ASSERT_EQ(result.find("hbase"), 0);
   ASSERT_EQ("hbase:acl", result);
 }
+
+HBASE_TEST_MAIN()

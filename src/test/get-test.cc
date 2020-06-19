@@ -17,11 +17,11 @@
  *
  */
 
+#include <glog/logging.h>
+
 #include "hbase/client/get.h"
 #include "hbase/client/cell.h"
-
-#include <glog/logging.h>
-#include <gtest/gtest.h>
+#include "hbase/test-util/test-util.h"
 
 using hbase::Cell;
 using hbase::Get;
@@ -219,3 +219,5 @@ TEST(Get, Exception) {
   ASSERT_THROW(Get tmp = Get(row), std::runtime_error);
   ASSERT_THROW(Get tmp = Get(""), std::runtime_error);
 }
+
+HBASE_TEST_MAIN()

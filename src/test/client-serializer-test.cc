@@ -16,8 +16,6 @@
  * limitations under the License.
  *
  */
-#include <gtest/gtest.h>
-
 #include <folly/io/Cursor.h>
 
 #include <string>
@@ -25,6 +23,7 @@
 #include "HBase.pb.h"
 #include "rpc/RPC.pb.h"
 #include "hbase/serde/rpc-serde.h"
+#include "hbase/test-util/test-util.h"
 
 using namespace hbase;
 using namespace hbase::pb;
@@ -73,3 +72,5 @@ TEST(RpcSerdeTest, TestHeaderDecode) {
   EXPECT_TRUE(h.ParseFromArray(header_buf->data(), header_buf->length()));
   EXPECT_EQ("elliott", h.user_info().effective_user());
 }
+
+HBASE_TEST_MAIN()

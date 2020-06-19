@@ -17,10 +17,10 @@
  *
  */
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 
 #include "hbase/client/delete.h"
 #include "hbase/client/mutation.h"
+#include "hbase/test-util/test-util.h"
 #include "hbase/utils/time-util.h"
 
 using hbase::Delete;
@@ -122,3 +122,5 @@ TEST(Delete, AddColumn) {
   auto &cell = del.FamilyMap().at(family)[2];
   EXPECT_EQ(ts, cell->Timestamp());
 }
+
+HBASE_TEST_MAIN()

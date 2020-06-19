@@ -20,8 +20,9 @@
 #include "hbase/client/cell.h"
 
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 #include <memory>
+
+#include "hbase/test-util/test-util.h"
 
 using hbase::Cell;
 using hbase::CellType;
@@ -193,3 +194,5 @@ TEST(CellTest, CellEstimatedSize) {
   EXPECT_EQ(cell4.EstimatedSize(), cell5.EstimatedSize());
   EXPECT_TRUE(cell6.EstimatedSize() >= cell1.EstimatedSize());
 }
+
+HBASE_TEST_MAIN()

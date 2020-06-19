@@ -17,17 +17,17 @@
  *
  */
 
-#include "hbase/test-util/test-util.h"
+#include "hbase/test-util/mini-cluster-util.h"
 #include <string.h>
 
 #include <folly/Format.h>
 
 #include "hbase/client/zk-util.h"
 
-using hbase::TestUtil;
+using hbase::MiniClusterUtility;
 using folly::Random;
 
-std::string TestUtil::RandString(int len) {
+std::string MiniClusterUtility::RandString(int len) {
   // Create the whole string.
   // Filling everything with z's
   auto s = std::string(len, 'z');
@@ -44,9 +44,9 @@ std::string TestUtil::RandString(int len) {
   return s;
 }
 
-TestUtil::TestUtil() : temp_dir_(TestUtil::RandString()) {}
+MiniClusterUtility::MiniClusterUtility() : temp_dir_(MiniClusterUtility::RandString()) {}
 
-void TestUtil::StartMiniCluster(int32_t num_region_servers) {
+void MiniClusterUtility::StartMiniCluster(int32_t num_region_servers) {
   mini_ = std::make_unique<MiniCluster>();
   mini_->StartCluster(num_region_servers);
 
@@ -55,43 +55,43 @@ void TestUtil::StartMiniCluster(int32_t num_region_servers) {
               mini_->GetConfValue(ZKUtil::kHBaseZookeeperClientPort_));
 }
 
-void TestUtil::StopMiniCluster() { mini_->StopCluster(); }
+void MiniClusterUtility::StopMiniCluster() { mini_->StopCluster(); }
 
-void TestUtil::CreateTable(const std::string &table, const std::string &family) {
+void MiniClusterUtility::CreateTable(const std::string &table, const std::string &family) {
   mini_->CreateTable(table, family);
 }
 
-void TestUtil::CreateTable(const std::string &table, const std::vector<std::string> &families) {
+void MiniClusterUtility::CreateTable(const std::string &table, const std::vector<std::string> &families) {
   mini_->CreateTable(table, families);
 }
 
-void TestUtil::CreateTable(const std::string &table, const std::string &family,
-                           const std::vector<std::string> &keys) {
+void MiniClusterUtility::CreateTable(const std::string &table, const std::string &family,
+                                     const std::vector<std::string> &keys) {
   mini_->CreateTable(table, family, keys);
 }
 
-void TestUtil::CreateTable(const std::string &table, const std::vector<std::string> &families,
-                           const std::vector<std::string> &keys) {
+void MiniClusterUtility::CreateTable(const std::string &table, const std::vector<std::string> &families,
+                                     const std::vector<std::string> &keys) {
   mini_->CreateTable(table, families, keys);
 }
 
-void TestUtil::MoveRegion(const std::string &region, const std::string &server) {
+void MiniClusterUtility::MoveRegion(const std::string &region, const std::string &server) {
   mini_->MoveRegion(region, server);
 }
 
-void TestUtil::StartStandAloneInstance() {
+void MiniClusterUtility::StartStandAloneInstance() {
   auto p = temp_dir_.path().string();
   auto cmd = std::string{"bin/start-local-hbase.sh " + p};
   auto res_code = std::system(cmd.c_str());
   CHECK_EQ(res_code, 0);
 }
 
-void TestUtil::StopStandAloneInstance() {
+void MiniClusterUtility::StopStandAloneInstance() {
   auto res_code = std::system("bin/stop-local-hbase.sh");
   CHECK_EQ(res_code, 0);
 }
 
-void TestUtil::RunShellCmd(const std::string &command) {
+void MiniClusterUtility::RunShellCmd(const std::string &command) {
   auto cmd_string = folly::sformat("echo \"{}\" | ../bin/hbase shell", command);
   auto res_code = std::system(cmd_string.c_str());
   CHECK_EQ(res_code, 0);

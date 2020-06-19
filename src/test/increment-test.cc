@@ -17,11 +17,11 @@
  *
  */
 #include <glog/logging.h>
-#include <gtest/gtest.h>
 
 #include "hbase/client/increment.h"
 #include "hbase/client/mutation.h"
 #include "hbase/client/put.h"
+#include "hbase/test-util/test-util.h"
 #include "hbase/utils/time-util.h"
 
 using hbase::Increment;
@@ -127,3 +127,5 @@ TEST(Increment, AddColumn) {
   EXPECT_EQ(2, incr.FamilyMap().size());
   EXPECT_EQ(1, incr.FamilyMap().at("family-2").size());
 }
+
+HBASE_TEST_MAIN()

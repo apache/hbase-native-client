@@ -18,10 +18,10 @@
  */
 
 #include <folly/Logging.h>
-#include <gtest/gtest.h>
 #include <string>
 
 #include "hbase/utils/bytes-util.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::BytesUtil;
 
@@ -67,3 +67,5 @@ TEST(TestBytesUtil, TestCreateClosestRowAfter) {
 
   EXPECT_EQ("f\\x00", BytesUtil::ToStringBinary(BytesUtil::CreateClosestRowAfter("f")));
 }
+
+HBASE_TEST_MAIN()

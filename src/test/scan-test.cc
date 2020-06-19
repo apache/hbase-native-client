@@ -17,10 +17,10 @@
  *
  */
 
-#include <gtest/gtest.h>
 #include <limits>
 
 #include "hbase/client/scan.h"
+#include "hbase/test-util/test-util.h"
 
 using hbase::Get;
 using hbase::Scan;
@@ -226,3 +226,5 @@ TEST(Scan, Exception) {
   ASSERT_THROW(Scan tmp(row), std::runtime_error);
   ASSERT_THROW(Scan tmp(""), std::runtime_error);
 }
+
+HBASE_TEST_MAIN()
