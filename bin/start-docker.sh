@@ -39,7 +39,7 @@ fi;
 # Build the image
 # 
 # This shouldn't be needed after the development environment is a little more stable.
-docker build -t hbase_native -f docker-files/Dockerfile .
+docker build -t hbase_native -f docker-files/Dockerfile docker-files
 
 # After the image is built run the thing
 docker run --privileged=true -h="securecluster" -p 16050:16050/tcp \
