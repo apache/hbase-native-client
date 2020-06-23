@@ -28,7 +28,7 @@ function(download_folly SOURCE_DIR BUILD_DIR)
       		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
     CMAKE_ARGS ${PASSTHROUGH_CMAKE_ARGS}
 		  "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/facebook-folly-proj-install"
-			-DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR}
       -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX}
       -DBYPRODUCT_SUFFIX=${BYPRODUCT_SUFFIX}
