@@ -24,7 +24,6 @@ function(download_wangle SOURCE_DIR BUILD_DIR)
   set(WANGLE_DOWNLOAD_DIR "${BUILD_DIR}/dependencies/facebook-wangle-proj-download")
   set(WANGLE_SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-wangle-proj-src")
   set(WANGLE_INSTALL_DIR "${BUILD_DIR}/dependencies/facebook-wangle-proj-install")
-
 	ExternalProject_Add(
 		facebook-wangle-proj
 		GIT_REPOSITORY "https://github.com/facebook/wangle.git"
