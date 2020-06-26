@@ -71,7 +71,7 @@ template <typename REQ, typename RESP>
 Future<std::vector<Try<RESP>>> AsyncBatchRpcRetryingCaller<REQ, RESP>::Call() {
   GroupAndSend(actions_, 1);
   // use the executor to convert he SemiFuture to a Future.
-  return std::move(collectAll(action2futures_)).via(cpu_pool_.get());
+  return collectAll(action2futures_).via(cpu_pool_.get());
 }
 
 template <typename REQ, typename RESP>
@@ -239,8 +239,7 @@ AsyncBatchRpcRetryingCaller<REQ, RESP>::GetRegionLocations(
     locs.push_back(location_cache_->LocateRegion(*table_name_, action->action()->row(),
                                                  RegionLocateType::kCurrent, locate_timeout_ns));
   }
-
-  return std::move(collectAll(locs)).via(cpu_pool_.get());
+  return collectAll(locs).via(cpu_pool_.get());
 }
 
 template <typename REQ, typename RESP>
@@ -332,7 +331,7 @@ AsyncBatchRpcRetryingCaller<REQ, RESP>::GetMultiResponse(const ActionsByServer &
     multi_calls.push_back(
         rpc_client_->AsyncCall(host, port, std::move(multi_req), user, "ClientService"));
   }
-  return std::move(collectAll(multi_calls)).via(cpu_pool_.get());
+  return collectAll(multi_calls).via(cpu_pool_.get());
 }
 
 template <typename REQ, typename RESP>

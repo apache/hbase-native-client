@@ -19,19 +19,16 @@
 ## SOURCE_DIR is typically the cmake source directory
 ## BINARY_DIR is the build directory, typically 'build'
 
-
 function(download_cyrus_sasl SOURCE_DIR BUILD_DIR)
   ExternalProject_Add(
-      cyrussasl
-      URL "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
-      PREFIX "${BUILD_DIR}/dependencies"
-      SOURCE_DIR "${BUILD_DIR}/dependencies/cyrussasl-src"
-      BINARY_DIR ${BUILD_DIR}/dependencies/cyrussasl-src/
-      CONFIGURE_COMMAND ./configure --enable-static --with-pic --prefix=${BUILD_DIR}/dependencies/cyrussasl-install
-        "CFLAGS=-fPIC"
-  			"CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC"
+    cyrussasl
+    URL "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+    PREFIX "${BUILD_DIR}/dependencies"
+    SOURCE_DIR "${BUILD_DIR}/dependencies/cyrussasl-src"
+    BINARY_DIR ${BUILD_DIR}/dependencies/cyrussasl-src/
+    CONFIGURE_COMMAND ./configure --enable-static --with-pic --prefix=${BUILD_DIR}/dependencies/cyrussasl-install
+      "CFLAGS=-fPIC"
+  		"CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC"
   )
-  add_library(sasl2 STATIC IMPORTED)
-  set_target_properties(sasl2 PROPERTIES IMPORTED_LOCATION "${BUILD_DIR}/dependencies/cyrussasl-install/lib/libsasl2.a")
   set(SASL2_DIR "${BUILD_DIR}/dependencies/cyrussasl-install/" CACHE STRING "" FORCE)
 endfunction(download_cyrus_sasl)
