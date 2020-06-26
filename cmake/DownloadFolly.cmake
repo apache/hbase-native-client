@@ -21,6 +21,7 @@ function(download_folly SOURCE_DIR BUILD_DIR)
 
   ExternalProject_Add(
     facebook-folly-proj
+    PREFIX "${BUILD_DIR}/dependencies"
     GIT_REPOSITORY "https://github.com/facebook/folly.git"
     GIT_TAG "v2020.05.18.00"
     SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"

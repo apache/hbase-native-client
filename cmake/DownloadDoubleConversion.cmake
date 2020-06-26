@@ -15,20 +15,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
-## Download facebook's folly library. 
+## Download Double Conversion library. 
 ## SOURCE_DIR is typically the cmake source directory
 function(download_doubleconversion SOURCE_DIR BUILD_DIR)
-	ExternalProject_Add(
-		doubleconversion-proj
-		GIT_REPOSITORY "https://github.com/google/double-conversion.git"
-		GIT_TAG "master"
-		SOURCE_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-src"
-		CMAKE_ARGS ${PASSTHROUGH_CMAKE_ARGS}
-				"-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/doubleconversion-proj-install"
-				-DCMAKE_POSITION_INDEPENDENT_CODE=ON
-				"${BUILD_ARGS}"
-		)
 
+  ExternalProject_Add(
+    doubleconversion-proj
+    PREFIX "${BUILD_DIR}/dependencies"
+    GIT_REPOSITORY "https://github.com/google/double-conversion.git"
+    GIT_TAG "master"
+    SOURCE_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-src"
+	CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/doubleconversion-proj-install" -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${BUILD_ARGS}"
+  )
 
-	set(DOUBLE_CONVERSION_ROOT_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-install" CACHE STRING "" FORCE)
+  set(DOUBLE_CONVERSION_ROOT_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-install" CACHE STRING "" FORCE)
 endfunction(download_doubleconversion) 
