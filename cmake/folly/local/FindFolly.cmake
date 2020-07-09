@@ -18,7 +18,6 @@
 # Stubs to allow us to find folly libs
 
 set(FOLLY_FOUND "true" CACHE STRING "" FORCE)
-set(FOLLY_INCLUDE_DIRS "${FOLLY_ROOT_DIR}/include" CACHE STRING "" FORCE)
 set(FOLLY_INCLUDE_DIR "${FOLLY_ROOT_DIR}/include" CACHE STRING "" FORCE)
 ## Given that folly is an older dependency, and the way it is built has evolved, newer
 ## versions of folly won't require an SO. For now it is far easier to link against the .so (BYPRODUCT_SHARED_SUFFIX)
@@ -28,8 +27,6 @@ set(FOLLY_LIBRARIES "${FOLLY_ROOT_DIR}/lib/${BYPRODUCT_PREFIX}folly${BYPRODUCT_S
 
 mark_as_advanced(
     FOLLY_ROOT_DIR
-    FOLLY_INCLUDE
-    FOLLY_INCLUDE_DIRS
     FOLLY_INCLUDE_DIR
     FOLLY_LIBRARIES
 )
