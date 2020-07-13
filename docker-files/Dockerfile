@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This Dockerfile is shared for both personal use as well as precommit testing. Certain changes might break Yetus
+# precommit test-patch integration, so be mindful of that when making changes.
+
 FROM ubuntu:16.04
 
 ARG CC=/usr/bin/gcc-5
@@ -71,10 +74,17 @@ RUN apt-get update && \
     echo 'xst -k hbase-host.keytab hbase/securecluster@EXAMPLE.COM' >> /tmp/krb-princ.pass ; \
     kadmin.local < /tmp/krb-princ.pass ;
  
-COPY docker-files/krb5.conf /etc
+COPY krb5.conf /etc
 
 RUN echo "enabled=1" >> /etc/default/apport
 
-ENTRYPOINT /usr/sbin/krb5kdc -P /var/run/krb5kdc.pid && echo "/tmp/core.%h.%e.%t" >> /proc/sys/kernel/core_pattern && sysctl -p && ulimit -c unlimited && /bin/bash
-
 WORKDIR /usr/src/hbase/hbase-native-client
+
+CMD ["/usr/sbin/krb5kdc -P /var/run/krb5kdc.pid && sysctl -p && ulimit -c unlimited && /bin/bash"]
+
+###
+# Everything past this point is either not needed for testing or breaks Yetus.
+# So tell Yetus not to read the rest of the file:
+# YETUS CUT HERE
+###
+

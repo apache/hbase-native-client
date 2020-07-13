@@ -16,6 +16,11 @@
 
 *.swp
 
+# build directories
+build*/*
+cmake-build-debug/*
+dependencies/*
+
 # Thirdparty dirs
 third-party/*
 /gcc-debug/
@@ -25,6 +30,7 @@ src/hbase/utils/version.h
 
 # Tests
 *-test
+src/test/target/*
 
 # Executables
 load-client
