@@ -125,9 +125,9 @@ optional<Configuration> HBaseConfigurationLoader::LoadDefaultResources() {
     }
   }
   if (success) {
-    return std::make_optional<Configuration>(Configuration(conf_property));
+    return Configuration(conf_property);
   } else {
-    return optional<Configuration>();
+    return none;
   }
 }
 
@@ -149,7 +149,7 @@ optional<Configuration> HBaseConfigurationLoader::LoadResources(
     }
   }
   if (success) {
-    return std::make_optional<Configuration>(Configuration(conf_property));
+    return Configuration(conf_property);
   } else {
     return optional<Configuration>();
   }
@@ -175,10 +175,7 @@ bool HBaseConfigurationLoader::LoadProperties(const std::string &file, ConfigMap
         std::string value_node = v.second.get<std::string>("value");
         if ((name_node.size() > 0) && (value_node.size() > 0)) {
           auto final_node = v.second.get_optional<std::string>("final");
-          // since we're converting from boost::optional to std::optional we'll make a check
-          // as boost asserts initialization.
-          auto finalopt = final_node.is_initialized() ? std::make_optional(final_node.get()) : std::optional<std::string>();
-          UpdateMapWithValue(property_map, name_node, value_node, finalopt);
+          UpdateMapWithValue(property_map, name_node, value_node, final_node.get());
         }
       }
     }
@@ -191,7 +188,7 @@ bool HBaseConfigurationLoader::LoadProperties(const std::string &file, ConfigMap
 
 bool HBaseConfigurationLoader::UpdateMapWithValue(ConfigMap &map, const std::string &key,
                                                   const std::string &value,
-                                                  std::optional<std::string> final_text) {
+                                                  optional<std::string> final_text) {
   auto map_value = map.find(key);
   if (map_value != map.end() && map_value->second.final) {
     return false;
