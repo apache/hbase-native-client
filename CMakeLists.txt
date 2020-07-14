@@ -130,21 +130,21 @@ endif()
 
 include_directories("${JAVA_HBASE_DIR}/hbase-common/target/generated-sources/native/")
 ############
-## Validate that we have C++ 17 support
+## Validate that we have C++ 14 support
 ############
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX17)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+if(COMPILER_SUPPORTS_CXX14)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 elseif(COMPILER_SUPPORTS_CXX0X)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
-  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no c++17 support. Please use a different C++ compiler.")
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not have C++14 support. Please use a different C++ compiler.")
 endif()
 set(HBASE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/hbase")
 set(HBASE_PROTO_GEN_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/hbase/if")
