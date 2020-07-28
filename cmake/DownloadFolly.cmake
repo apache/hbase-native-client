@@ -27,8 +27,9 @@ function(download_folly SOURCE_DIR BUILD_DIR)
     SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy
       		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
+          COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
     CMAKE_ARGS ${PASSTHROUGH_CMAKE_ARGS}
-		  "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/facebook-folly-proj-install"
+		  -DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/facebook-folly-proj-install
       -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR}
       -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX}
@@ -36,6 +37,7 @@ function(download_folly SOURCE_DIR BUILD_DIR)
       -DBOOST_ROOT=${BOOST_ROOT}
       -DBOOST_INCLUDEDIR=${BOOST_ROOT}/include
       -DBOOST_LIBRARYDIR=${BOOST_ROOT}/lib
+      -DBOOST_LIBRARIES=${BOOST_LIBRARIES}
 			"${BUILD_ARGS}"
   )
   set(FOLLY_ROOT_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-install" CACHE STRING "" FORCE)

@@ -36,7 +36,7 @@ function(generate_protobuf_src SRCS HDRS HDR_DIR PROTO_PATH)
   set(${SRCS})
   set(${HDRS})
   foreach(FIL ${ARGN})
-  	message("Generating ${FIL} with ${PROTOBUF_PROTOC_EXECUTABLE}")
+    message("Generating ${FIL} with ${PROTOBUF_PROTOC_EXECUTABLE}")
     get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
     get_filename_component(FIL_WE ${FIL} NAME_WE)
     ## get the directory where our protobufs are stored

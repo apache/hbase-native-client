@@ -26,7 +26,6 @@ find_library(KRB5_LIBRARIES
     HINTS ${KRB5_ROOT_DIR}/lib
 )
 
-
 find_library(GSSAPI_KRB5_LIBRARY gssapi_krb5)
 
 find_path(KRB5_INCLUDE_DIR

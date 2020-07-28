@@ -25,8 +25,7 @@ function(download_doubleconversion SOURCE_DIR BUILD_DIR)
     GIT_REPOSITORY "https://github.com/google/double-conversion.git"
     GIT_TAG "master"
     SOURCE_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-src"
-	CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/doubleconversion-proj-install" -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${BUILD_ARGS}"
-  )
+    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/doubleconversion-proj-install" -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${BUILD_ARGS}")
 
   set(DOUBLE_CONVERSION_ROOT_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-install" CACHE STRING "" FORCE)
 endfunction(download_doubleconversion) 

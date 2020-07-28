@@ -28,7 +28,7 @@ function(download_cyrus_sasl SOURCE_DIR BUILD_DIR)
     BINARY_DIR ${BUILD_DIR}/dependencies/cyrussasl-src/
     CONFIGURE_COMMAND ./configure --enable-static --with-pic --prefix=${BUILD_DIR}/dependencies/cyrussasl-install
       "CFLAGS=-fPIC"
-  		"CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC"
+      "CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC"
   )
   set(SASL2_DIR "${BUILD_DIR}/dependencies/cyrussasl-install/" CACHE STRING "" FORCE)
 endfunction(download_cyrus_sasl)
