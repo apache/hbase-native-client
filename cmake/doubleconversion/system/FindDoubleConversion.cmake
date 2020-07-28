@@ -14,7 +14,7 @@
 
 # Finds libdouble-conversion.
 #
- DEFINE DOUBLE_CONVERSION_ROOT_DIR to provide a hint
+# DEFINE DOUBLE_CONVERSION_ROOT_DIR to provide a hint
 # This module defines:
 # DOUBLE_CONVERSION_INCLUDE_DIR
 # DOUBLE_CONVERSION_LIBRARY

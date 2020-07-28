@@ -29,6 +29,7 @@ function(download_fizz SOURCE_DIR BUILD_DIR)
     SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-fizz-proj-src"
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local/FindFolly.cmake" ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz/cmake/
       COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake" ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz/cmake
+      COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake" ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz/cmake
       COMMAND patch ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz/CMakeLists.txt "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/fizz.v2020.05.18.00.cmake" 
     INSTALL_DIR "${BUILD_DIR}/dependencies/facebook-fizz-proj-install"
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR} -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX} -DBYPRODUCT_SUFFIX=${BYPRODUCT_SUFFIX} -DCMAKE_INSTALL_PREFIX:PATH=${BUILD_DIR}/dependencies/facebook-fizz-proj-install ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz # Tell CMake to use subdirectory as source.
