@@ -74,6 +74,8 @@ function personality_globals
   # shellcheck disable=SC2034
   # Passed to cmake command using a custom personality.
   CMAKE_ARGS="-DDOWNLOAD_DEPENDENCIES=ON"
+  # Passed to make compilation command.
+  MAKE_COMPILE_ARGS="-j$(nproc)"
   # shellcheck disable=SC2034
   # Expected by Yetus for compiling non-jvm projects.
   JVM_REQUIRED=false
@@ -106,7 +108,10 @@ function personality_modules
   local args
   yetus_info "Personality: ${repostatus} ${testtype}"
   clear_personality_queue
-  if [[ "${testtype}" =~ CMakeLists.txt ]]; then
+  if [[ "${testtype}" =~ compile ]]; then
+    args=${MAKE_COMPILE_ARGS}
+    yetus_debug "Appending make compile args ${args}"
+  elif [[ "${testtype}" =~ CMakeLists.txt ]]; then
     args=${CMAKE_ARGS}
     yetus_debug "Appending CMake args ${args}"
   fi
