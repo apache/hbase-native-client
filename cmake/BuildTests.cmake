@@ -53,7 +53,7 @@ function(createTests testName)
     #target_link_libraries(${testName} ${PROTOBUF_LIBRARY})
     #${PROTOBUF_LIBRARY}
 
-    target_link_libraries(${testName} hbaseclient-static testutil ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} 
+    target_link_libraries(${testName} hbaseclient-static testutil ${CMAKE_DL_LIBS} 
     ${Java_LIBRARIES}
     ${JNI_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -63,7 +63,8 @@ function(createTests testName)
     ${GFLAGS_SHARED_LIB}
     ${KRB5_LIBRARIES}
     ${ZOOKEEPER_LIBRARIES} ${OPENSSL_LIBRARIES}
-    ${GLOG_SHARED_LIB})
+    ${GLOG_SHARED_LIB}
+    ${CMAKE_THREAD_LIBS_INIT})
 endfunction()
 enable_testing(test)
 SET(TEST_DIR ${CMAKE_SOURCE_DIR}/src/test)

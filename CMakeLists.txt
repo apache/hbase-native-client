@@ -32,7 +32,6 @@ include(DownloadProject)
 include(ExecuteMaven)
 include(CheckCXXCompilerFlag)
 
-
 option(DOWNLOAD_DEPENDENCIES "Downloads and builds all dependencies locally " OFF)
 option(HBASE_TARGET_TAG "HBase tag to be used if HBASE_HOME is not set" "master")
 option(HBASE_HOME "Path to HBase" "")
@@ -56,11 +55,17 @@ endif()
 ######### Includes
 ## include the Protobuf generation code
 include(ProtobufGen)
+include(DownloadBoost)
 include(DownloadFolly)
 include(DownloadWangle)
 include(DownloadZookeeper)
 
 set(PROJECT_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dependencies")
+
+set(BOOST_MIN_VERSION "1.6.1")
+# Union of all the libs needed by the current project and dependencies (like folly, wangle etc).
+# Just update this list if more libraries are needed and they will be included and linked automatically.
+set(BOOST_LIBS context coroutine thread system filesystem regex program_options)
 
 if (DOWNLOAD_DEPENDENCIES)
   ## we want to find the system protoc
@@ -78,11 +83,11 @@ if (DOWNLOAD_DEPENDENCIES)
   set(PROTOBUF_PROTOC_EXECUTABLE "${Protobuf_BINARY_DIR}/bin/protoc" CACHE STRING "" FORCE)
   ## Add CMAKE_MODULE_PATHS
 	
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local")
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/zookeeper/local")
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/protobuf/local")
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local")
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/wangle/local")
-
 else()
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/zookeeper/system")
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/system")
@@ -154,16 +159,16 @@ endif (OPENSSL_FOUND)
 
 
 if (DOWNLOAD_DEPENDENCIES)
+  download_boost(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} "${BOOST_LIBS}")
   download_folly(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
   download_wangle(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
   download_zookeeper(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif(DOWNLOAD_DEPENDENCIES)
 
-set(BOOST_MIN_VERSION "1.6.1")
 
 # ensure we have required dependencies
 find_package(Threads)
-find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS context thread system filesystem regex)
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS "${BOOST_LIBS}")
 find_package(LibEvent REQUIRED)
 find_package(Gflags REQUIRED)
 if (DOWNLOAD_DEPENDENCIES)
@@ -309,6 +314,9 @@ add_custom_target(
     COMMAND ${CMAKE_SOURCE_DIR}/bin/cpplint.sh)
 
 if (DOWNLOAD_DEPENDENCIES)
+  add_dependencies(facebook-folly-proj boost)
+  add_dependencies(hbaseclient-static boost)
+  add_dependencies(hbaseclient-shared boost)
   add_dependencies(hbaseclient-static Protobuf)
   add_dependencies(hbaseclient-shared Protobuf)
   add_dependencies(facebook-wangle-proj facebook-folly-proj)
@@ -341,3 +349,4 @@ install(
     DIRECTORY "${CMAKE_BINARY_DIR_GEN}"
     DESTINATION include/hbase/if
     FILES_MATCHING PATTERN "hbase/if/*.h")
+
