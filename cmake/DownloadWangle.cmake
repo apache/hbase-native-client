@@ -24,7 +24,7 @@ function(download_wangle SOURCE_DIR BUILD_DIR)
   set(WANGLE_SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-wangle-proj-src")
   set(WANGLE_INSTALL_DIR "${BUILD_DIR}/dependencies/facebook-wangle-proj-install")
   if (DOWNLOAD_DEPENDENCIES)
-    set(PATCH_FOLLY ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local/FindFolly.cmake" "${WANGLE_SOURCE_DIR}/wangle/cmake")
+    set(PATCH_FOLLY ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local/FindFolly.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake" "${WANGLE_SOURCE_DIR}/wangle/cmake")
   else()
     set(PATCH_FOLLY "")
   endif() 
@@ -37,7 +37,7 @@ function(download_wangle SOURCE_DIR BUILD_DIR)
      SOURCE_DIR ${WANGLE_SOURCE_DIR}
      PATCH_COMMAND ${PATCH_FOLLY}
      INSTALL_DIR ${WANGLE_INSTALL_DIR}
-     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DCMAKE_INSTALL_PREFIX:PATH=${WANGLE_INSTALL_DIR} "${WANGLE_SOURCE_DIR}/wangle" # Tell CMake to use subdirectory as source.
+     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DBOOST_ROOT=${BOOST_ROOT} -DCMAKE_INSTALL_PREFIX:PATH=${WANGLE_INSTALL_DIR} "${WANGLE_SOURCE_DIR}/wangle" # Tell CMake to use subdirectory as source.
   )
   set(WANGLE_ROOT_DIR ${WANGLE_INSTALL_DIR} CACHE STRING "" FORCE)
 endfunction(download_wangle) 

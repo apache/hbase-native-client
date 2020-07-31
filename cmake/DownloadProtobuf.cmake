@@ -22,8 +22,6 @@
 #################### PROTOBUF
 
 function(download_protobuf SOURCE_DIR BINARY_DIR)
-
-
 	ExternalProject_Add(
 	  Protobuf
 	  GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
@@ -46,7 +44,5 @@ function(download_protobuf SOURCE_DIR BINARY_DIR)
 	set(PROTOBUF_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/dependencies/protobuf/include" CACHE STRING "" FORCE)
 	add_dependencies(protobuf Protobuf)
 	set(PROTOBUF_FOUND TRUE CACHE STRING "" FORCE)
-	
-		
 endfunction(download_protobuf)
 

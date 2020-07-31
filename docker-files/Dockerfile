@@ -30,7 +30,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 RUN apt-get update && \
     apt-get install -y vim maven inetutils-ping python-pip doxygen graphviz clang-format valgrind \
         wget libgflags-dev libgoogle-glog-dev dh-autoreconf pkg-config libssl-dev build-essential \
-        libboost-all-dev libevent-dev cmake libkrb5-dev git openjdk-8-jdk curl unzip google-mock libsodium-dev libdouble-conversion-dev && \
+        libevent-dev cmake libkrb5-dev git openjdk-8-jdk curl unzip google-mock libsodium-dev libdouble-conversion-dev && \
     pip install yapf && \
     apt-get -qq clean && \
     apt-get -y -qq autoremove && \
