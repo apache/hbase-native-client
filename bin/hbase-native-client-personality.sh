@@ -73,7 +73,9 @@ function personality_globals
   # Passed to cmake command using a custom personality.
   CMAKE_ARGS="-DDOWNLOAD_DEPENDENCIES=ON"
   # Passed to make compilation command.
-  MAKE_COMPILE_ARGS="-j$(nproc)"
+  # Concurrency was determined after some trial and error. Higher
+  # values resulted in memory limit issues and compiler crashes.
+  MAKE_COMPILE_ARGS="-j4"
   # shellcheck disable=SC2034
   # Expected by Yetus for compiling non-jvm projects.
   JVM_REQUIRED=false
@@ -91,7 +93,10 @@ function personality_globals
   PROCLIMIT=10000
   # Override if you want to bump up the memlimit for docker.
   # shellcheck disable=SC2034
-  DOCKERMEMLIMIT=4g
+  DOCKERMEMLIMIT=16g
+  # shellcheck disable=SC2034
+  # Logs the ctest output when a test fails.
+  CTEST_OUTPUT_ON_FAILURE=1
 }
 
 ## @description  Queue up modules for this personality
