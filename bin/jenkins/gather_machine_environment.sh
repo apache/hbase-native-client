@@ -49,6 +49,7 @@ cat /proc/diskstats >"${output}/diskstats" 2>&1 || true
 cat /sys/block/sda/stat >"${output}/sys-block-sda-stat" 2>&1 || true
 df -h >"${output}/df-h" 2>&1 || true
 ps -Aww >"${output}/ps-Aww" 2>&1 || true
+hostname -f >"${output}/fqdn-hostname" 2>&1 || true
 ifconfig -a >"${output}/ifconfig-a" 2>&1 || true
 lsblk -ta >"${output}/lsblk-ta" 2>&1 || true
 lsblk -fa >"${output}/lsblk-fa" 2>&1 || true
