@@ -66,8 +66,6 @@ function docker_do_env_adds
 function personality_globals
 {
   # shellcheck disable=SC2034
-  SUDO_USER=root
-  # shellcheck disable=SC2034
   BUILD_NATIVE=true
   # shellcheck disable=SC2034
   BUILDTOOL=cmake
