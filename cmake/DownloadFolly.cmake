@@ -25,8 +25,7 @@ function(download_folly SOURCE_DIR BUILD_DIR)
     GIT_REPOSITORY "https://github.com/facebook/folly.git"
     GIT_TAG "v2020.05.18.00"
     SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-src"
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy
-      		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
           COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake" ${BUILD_DIR}/dependencies/facebook-folly-proj-src/CMake
     CMAKE_ARGS ${PASSTHROUGH_CMAKE_ARGS}
 		  -DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/facebook-folly-proj-install
@@ -38,7 +37,7 @@ function(download_folly SOURCE_DIR BUILD_DIR)
       -DBOOST_INCLUDEDIR=${BOOST_ROOT}/include
       -DBOOST_LIBRARYDIR=${BOOST_ROOT}/lib
       -DBOOST_LIBRARIES=${BOOST_LIBRARIES}
-			"${BUILD_ARGS}"
+      "${BUILD_ARGS}"
   )
   set(FOLLY_ROOT_DIR "${BUILD_DIR}/dependencies/facebook-folly-proj-install" CACHE STRING "" FORCE)
 endfunction(download_folly) 

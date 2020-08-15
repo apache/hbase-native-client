@@ -30,12 +30,16 @@ function(download_wangle SOURCE_DIR BUILD_DIR)
 		SOURCE_DIR "${BUILD_DIR}/dependencies/facebook-wangle-proj-src"
 		PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cmake/folly/local/FindFolly.cmake ${WANGLE_SOURCE_DIR}/wangle/cmake/
       		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cmake/fizz/local/FindFizz.cmake ${WANGLE_SOURCE_DIR}/wangle/cmake/
-          COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake ${WANGLE_SOURCE_DIR}/wangle/cmake/
-          COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake ${WANGLE_SOURCE_DIR}/wangle/cmake/
-      		COMMAND patch ${WANGLE_SOURCE_DIR}/wangle/CMakeLists.txt ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/wangle.v2020.05.18.00.cmake
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake ${WANGLE_SOURCE_DIR}/wangle/cmake/
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cmake/doubleconversion/local/FindDoubleConversion.cmake ${WANGLE_SOURCE_DIR}/wangle/cmake/
+            COMMAND patch ${WANGLE_SOURCE_DIR}/wangle/CMakeLists.txt ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/wangle.v2020.05.18.00.cmake
 		INSTALL_DIR "${WANGLE_INSTALL_DIR}"
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DFIZZ_ROOT_DIR=${FIZZ_ROOT_DIR} -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR} -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX}  -DCMAKE_INSTALL_PREFIX:PATH=${WANGLE_INSTALL_DIR}
-        	${WANGLE_SOURCE_DIR}/wangle # Tell CMake to use subdirectory as source.
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DFIZZ_ROOT_DIR=${FIZZ_ROOT_DIR} -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR} -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX}  -DCMAKE_INSTALL_PREFIX:PATH=${WANGLE_INSTALL_DIR}
+            -DBOOST_ROOT=${BOOST_ROOT}
+            -DBOOST_INCLUDEDIR=${BOOST_ROOT}/include
+            -DBOOST_LIBRARYDIR=${BOOST_ROOT}/lib
+            -DBOOST_LIBRARIES=${BOOST_LIBRARIES}
+            ${WANGLE_SOURCE_DIR}/wangle # Tell CMake to use subdirectory as source.
 		)
 
 	set(WANGLE_ROOT_DIR "${WANGLE_INSTALL_DIR}" CACHE STRING "" FORCE)
