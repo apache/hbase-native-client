@@ -26,7 +26,7 @@ function(download_boost SOURCE_DIR BUILD_DIR BOOST_LIBS)
   set(BOOST_INSTALL_DIR "${BUILD_DIR}/dependencies/boost-install")
 
   set(CFLAGS "-fPIC")
-  set(CXXFLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14")
+  set(CXXFLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
   # Only compile and install the needed libs.
   set(LIBS_TO_COMPILE "")

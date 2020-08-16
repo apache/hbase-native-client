@@ -23,7 +23,7 @@ function(download_doubleconversion SOURCE_DIR BUILD_DIR)
     doubleconversion-proj
     PREFIX "${BUILD_DIR}/dependencies"
     GIT_REPOSITORY "https://github.com/google/double-conversion.git"
-    GIT_TAG "master"
+    GIT_TAG "b1d531bfb130e7149ffe24bb0f1c5c01f20c3a5f" ## Commit hash from master
     SOURCE_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-src"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/doubleconversion-proj-install" -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${BUILD_ARGS}")
 
