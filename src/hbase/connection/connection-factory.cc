@@ -39,8 +39,8 @@ using std::chrono::nanoseconds;
 
 namespace hbase {
 
-ConnectionFactory::ConnectionFactory(std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                                     std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+ConnectionFactory::ConnectionFactory(std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                                     std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                                      std::shared_ptr<Codec> codec,
                                      std::shared_ptr<Configuration> conf,
                                      nanoseconds connect_timeout)
@@ -67,14 +67,14 @@ std::shared_ptr<HBaseService> ConnectionFactory::Connect(
     const std::string &hostname, uint16_t port) {
   // connection should happen from an IO thread
   try {
-    auto future = via(io_executor_.get()).then([=]() {
+    auto future = via(io_executor_.get()).thenValue([&](folly::Unit) {
       VLOG(1) << "Connecting to server: " << hostname << ":" << port;
       return client_bootstrap->connect(folly::SocketAddress(hostname, port, true),
                                        std::chrono::duration_cast<milliseconds>(connect_timeout_));
     });
 
     // See about using shared promise for this.
-    auto pipeline = future.get();
+    auto pipeline = std::move(future).get();
 
     VLOG(1) << "Connected to server: " << hostname << ":" << port;
     auto dispatcher =

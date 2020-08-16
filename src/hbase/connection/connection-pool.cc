@@ -20,7 +20,7 @@
 #include "hbase/connection/connection-pool.h"
 
 #include <folly/Conv.h>
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <wangle/service/Service.h>
 
 #include <memory>
@@ -31,8 +31,8 @@ using std::chrono::nanoseconds;
 
 namespace hbase {
 
-ConnectionPool::ConnectionPool(std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                               std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+ConnectionPool::ConnectionPool(std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                               std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                                std::shared_ptr<Codec> codec, std::shared_ptr<Configuration> conf,
                                nanoseconds connect_timeout)
     : cf_(std::make_shared<ConnectionFactory>(io_executor, cpu_executor, codec, conf,

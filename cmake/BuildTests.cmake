@@ -39,29 +39,24 @@ target_include_directories(testutil PRIVATE BEFORE${Zookeeper_INCLUDE_DIRS})
 target_include_directories(testutil PRIVATE BEFORE${KRB5_INCLUDE_DIRS})
 target_include_directories(testutil PRIVATE BEFORE${Java_INCLUDE_DIRS})
 target_include_directories(testutil PRIVATE BEFORE${FOLLY_INCLUDE_DIRS})
-target_link_libraries(testutil hbaseclient-static ${CMAKE_THREAD_LIBS_INIT} ${Java_LIBRARIES} ${JNI_LIBRARIES} ${PROTOBUF_LIBRARY} ${Boost_LIBRARIES} ${GFLAGS_SHARED_LIB} ${GMOCK_SHARED_LIB} ${GTEST_BOTH_LIBRARIES} ${SASL_LIBS} ${GFLAGS_SHARED_LIB} ${KRB5_LIBRARIES} ${OPENSSL_LIBRARIES} ${Zookeeper_LIBRARIES})
+target_link_libraries(testutil hbaseclient-static ${CMAKE_THREAD_LIBS_INIT} ${Java_LIBRARIES} ${JNI_LIBRARIES} ${PROTOBUF_LIBRARY} ${Boost_LIBRARIES} ${GFLAGS_SHARED_LIB} ${GMOCK_SHARED_LIB} ${GTEST_BOTH_LIBRARIES} ${KRB5_LIBRARIES} ${SASL_LIBS} ${GFLAGS_SHARED_LIB} ${OPENSSL_LIBRARIES} ${Zookeeper_LIBRARIES})
 function(createTests testName)
-   message ("-- Including Test: ${testName}")
+   message (STATUS "Including Test: ${testName}")
     target_include_directories(${testName} PRIVATE BEFORE "include")
     target_include_directories(${testName} PRIVATE BEFORE "${Java_INCLUDE_DIRS}")
     target_include_directories(${testName} PRIVATE BEFORE "${JNI_INCLUDE_DIRS}")
     target_include_directories(${testName} PRIVATE BEFORE "${Boost_INCLUDE_DIR}")
     target_include_directories(${testName} PRIVATE BEFORE "${GTEST_INCLUDE_DIRS}")
     target_include_directories(${testName} PRIVATE BEFORE "${OPENSSL_INCLUDE_DIR}")
-
-	
-    #target_link_libraries(${testName} ${PROTOBUF_LIBRARY})
-    #${PROTOBUF_LIBRARY}
-
-    target_link_libraries(${testName} hbaseclient-static testutil ${CMAKE_DL_LIBS} 
+    target_link_libraries(${testName} hbaseclient-static testutil ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} 
     ${Java_LIBRARIES}
     ${JNI_LIBRARIES}
     ${Boost_LIBRARIES}
     ${GFLAGS_SHARED_LIB}
     ${GTEST_BOTH_LIBRARIES}
+    ${KRB5_LIBRARIES}
     ${SASL_LIBS}
     ${GFLAGS_SHARED_LIB}
-    ${KRB5_LIBRARIES}
     ${ZOOKEEPER_LIBRARIES} ${OPENSSL_LIBRARIES}
     ${GLOG_SHARED_LIB}
     ${CMAKE_THREAD_LIBS_INIT})

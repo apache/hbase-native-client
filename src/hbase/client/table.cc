@@ -49,8 +49,7 @@ Table::Table(const TableName &table_name, std::shared_ptr<AsyncConnection> async
 Table::~Table() {}
 
 std::shared_ptr<hbase::Result> Table::Get(const hbase::Get &get) {
-  auto context = async_table_->Get(get);
-  return context.get(operation_timeout());
+  return async_table_->Get(get).get(operation_timeout());
 }
 
 std::shared_ptr<ResultScanner> Table::Scan(const hbase::Scan &scan) {
@@ -69,37 +68,31 @@ int64_t Table::ResultSize2CacheSize(int64_t max_results_size) const {
 }
 
 void Table::Put(const hbase::Put &put) {
-  auto future = async_table_->Put(put);
-  future.get(operation_timeout());
+  async_table_->Put(put).get(operation_timeout());
 }
 
 bool Table::CheckAndPut(const std::string &row, const std::string &family,
                         const std::string &qualifier, const std::string &value,
                         const hbase::Put &put, const pb::CompareType &compare_op) {
-  auto context = async_table_->CheckAndPut(row, family, qualifier, value, put, compare_op);
-  return context.get(operation_timeout());
+  return async_table_->CheckAndPut(row, family, qualifier, value, put, compare_op).get(operation_timeout());
 }
 
 bool Table::CheckAndDelete(const std::string &row, const std::string &family,
                            const std::string &qualifier, const std::string &value,
                            const hbase::Delete &del, const pb::CompareType &compare_op) {
-  auto context = async_table_->CheckAndDelete(row, family, qualifier, value, del, compare_op);
-  return context.get(operation_timeout());
+  return async_table_->CheckAndDelete(row, family, qualifier, value, del, compare_op).get(operation_timeout());
 }
 
 void Table::Delete(const hbase::Delete &del) {
-  auto future = async_table_->Delete(del);
-  future.get(operation_timeout());
+  async_table_->Delete(del).get(operation_timeout());
 }
 
 std::shared_ptr<hbase::Result> Table::Increment(const hbase::Increment &increment) {
-  auto context = async_table_->Increment(increment);
-  return context.get(operation_timeout());
+  return async_table_->Increment(increment).get(operation_timeout());
 }
 
 std::shared_ptr<hbase::Result> Table::Append(const hbase::Append &append) {
-  auto context = async_table_->Append(append);
-  return context.get(operation_timeout());
+  return async_table_->Append(append).get(operation_timeout());
 }
 
 milliseconds Table::operation_timeout() const {

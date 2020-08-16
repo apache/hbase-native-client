@@ -21,7 +21,7 @@
 #include <wangle/channel/Handler.h>
 
 #include <folly/Format.h>
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <folly/SocketAddress.h>
 #include <folly/String.h>
 #include <folly/experimental/TestUtil.h>
@@ -79,16 +79,16 @@ std::shared_ptr<folly::SocketAddress> GetRpcServerAddress(ServerPtr server) {
 }
 
 std::shared_ptr<RpcClient> CreateRpcClient(std::shared_ptr<Configuration> conf) {
-  auto io_executor = std::make_shared<wangle::IOThreadPoolExecutor>(1);
-  auto cpu_executor = std::make_shared<wangle::CPUThreadPoolExecutor>(1);
+  auto io_executor = std::make_shared<folly::IOThreadPoolExecutor>(1);
+  auto cpu_executor = std::make_shared<folly::CPUThreadPoolExecutor>(1);
   auto client = std::make_shared<RpcClient>(io_executor, cpu_executor, nullptr, conf);
   return client;
 }
 
 std::shared_ptr<RpcClient> CreateRpcClient(std::shared_ptr<Configuration> conf,
                                            std::chrono::nanoseconds connect_timeout) {
-  auto io_executor = std::make_shared<wangle::IOThreadPoolExecutor>(1);
-  auto cpu_executor = std::make_shared<wangle::CPUThreadPoolExecutor>(1);
+  auto io_executor = std::make_shared<folly::IOThreadPoolExecutor>(1);
+  auto cpu_executor = std::make_shared<folly::CPUThreadPoolExecutor>(1);
   auto client =
       std::make_shared<RpcClient>(io_executor, cpu_executor, nullptr, conf, connect_timeout);
   return client;
@@ -108,15 +108,16 @@ TEST_F(RpcTest, Ping) {
                                            std::make_shared<EmptyResponseProto>(), method);
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
-      .then([&](std::unique_ptr<Response> response) {
+      .thenValue([&](std::unique_ptr<Response> response) {
         auto pb_resp = std::static_pointer_cast<EmptyResponseProto>(response->resp_msg());
         EXPECT_TRUE(pb_resp != nullptr);
         VLOG(1) << folly::sformat(FLAGS_result_format, method, "");
       })
-      .onError([&](const folly::exception_wrapper& ew) {
+      .thenError([&](const folly::exception_wrapper& ew) {
         FAIL() << folly::sformat(FLAGS_fail_no_ex_format, method);
       })
       .get();
@@ -142,16 +143,17 @@ TEST_F(RpcTest, Echo) {
   pb_msg->set_message(greetings);
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
-      .then([&](std::unique_ptr<Response> response) {
+      .thenValue([&](std::unique_ptr<Response> response) {
         auto pb_resp = std::static_pointer_cast<EchoResponseProto>(response->resp_msg());
         EXPECT_TRUE(pb_resp != nullptr);
         VLOG(1) << folly::sformat(FLAGS_result_format, method, pb_resp->message());
         EXPECT_EQ(greetings, pb_resp->message());
       })
-      .onError([&](const folly::exception_wrapper& ew) {
+      .thenError([&](const folly::exception_wrapper& ew) {
         FAIL() << folly::sformat(FLAGS_fail_no_ex_format, method);
       })
       .get();
@@ -173,13 +175,14 @@ TEST_F(RpcTest, Error) {
   auto request = std::make_unique<Request>(std::make_shared<EmptyRequestProto>(),
                                            std::make_shared<EmptyResponseProto>(), method);
   /* sending out request */
+auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
-      .then([&](std::unique_ptr<Response> response) {
+      .thenValue([&](std::unique_ptr<Response> response) {
         FAIL() << folly::sformat(FLAGS_fail_ex_format, method);
       })
-      .onError([&](const folly::exception_wrapper& ew) {
+      .thenError([&](const folly::exception_wrapper& ew) {
         VLOG(1) << folly::sformat(FLAGS_result_format, method, ew.what());
         std::string kRemoteException = demangle(typeid(hbase::RemoteException)).toStdString();
         std::string kRpcTestException = demangle(typeid(hbase::RpcTestException)).toStdString();
@@ -214,13 +217,14 @@ TEST_F(RpcTest, SocketNotOpen) {
   server->join();
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
-      .then([&](std::unique_ptr<Response> response) {
+      .thenValue([&](std::unique_ptr<Response> response) {
         FAIL() << folly::sformat(FLAGS_fail_ex_format, method);
       })
-      .onError([&](const folly::exception_wrapper& ew) {
+      .thenError([&](const folly::exception_wrapper& ew) {
         VLOG(1) << folly::sformat(FLAGS_result_format, method, ew.what());
         std::string kConnectionException =
             demangle(typeid(hbase::ConnectionException)).toStdString();
@@ -265,15 +269,16 @@ TEST_F(RpcTest, Pause) {
   pb_msg->set_ms(ms);
 
   /* sending out request */
+  auto server_host_name = server_addr->getIPAddress().isNonroutable() ? "127.0.0.1" : server_addr->getAddressStr();
   client
-      ->AsyncCall(server_addr->getAddressStr(), server_addr->getPort(), std::move(request),
+      ->AsyncCall(server_host_name, server_addr->getPort(), std::move(request),
                   hbase::security::User::defaultUser())
-      .then([&](std::unique_ptr<Response> response) {
+      .thenValue([&](std::unique_ptr<Response> response) {
         auto pb_resp = std::static_pointer_cast<EmptyResponseProto>(response->resp_msg());
         EXPECT_TRUE(pb_resp != nullptr);
         VLOG(1) << folly::sformat(FLAGS_result_format, method, "");
       })
-      .onError([&](const folly::exception_wrapper& ew) {
+      .thenError([&](const folly::exception_wrapper& ew) {
         VLOG(1) << folly::sformat(FLAGS_result_format, method, ew.what());
         FAIL() << folly::sformat(FLAGS_fail_no_ex_format, method);
       })

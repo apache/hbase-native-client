@@ -20,10 +20,10 @@
 #include "hbase/connection/rpc-client.h"
 
 #include <folly/Format.h>
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <folly/futures/Future.h>
 #include <unistd.h>
-#include <wangle/concurrent/IOThreadPoolExecutor.h>
+#include <folly/executors/IOThreadPoolExecutor.h>
 #include "hbase/exceptions/exception.h"
 
 using hbase::security::User;
@@ -31,8 +31,8 @@ using std::chrono::nanoseconds;
 
 namespace hbase {
 
-RpcClient::RpcClient(std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                     std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+RpcClient::RpcClient(std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                     std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                      std::shared_ptr<Codec> codec, std::shared_ptr<Configuration> conf,
                      nanoseconds connect_timeout)
     : io_executor_(io_executor), conf_(conf) {
@@ -83,7 +83,7 @@ folly::Future<std::unique_ptr<Response>> RpcClient::SendRequest(
   try {
     return GetConnection(remote_id)
         ->SendRequest(std::move(req))
-        .onError([&, this](const folly::exception_wrapper& ew) {
+        .thenError([&, this](const folly::exception_wrapper& ew) {
           VLOG(3) << folly::sformat("RpcClient Exception: {}", ew.what());
           ew.with_exception([&, this](const hbase::ConnectionException& re) {
             /* bad connection, remove it from pool. */

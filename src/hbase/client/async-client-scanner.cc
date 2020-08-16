@@ -59,7 +59,7 @@ folly::Future<std::shared_ptr<OpenScannerResponse>> AsyncClientScanner::CallOpen
   return rpc_client
       ->AsyncCall(loc->server_name().host_name(), loc->server_name().port(), std::move(preq),
                   security::User::defaultUser(), "ClientService")
-      .then([self, loc, controller, rpc_client](const std::unique_ptr<Response>& presp) {
+      .thenValue([self, loc, controller, rpc_client](const std::unique_ptr<Response>& presp) {
         VLOG(5) << "Scan Response:" << presp->DebugString();
         return std::make_shared<OpenScannerResponse>(rpc_client, presp, loc, controller);
       });
@@ -88,16 +88,16 @@ void AsyncClientScanner::OpenScanner() {
                     ->Build();
 
   caller->Call()
-      .then([this, self](std::shared_ptr<OpenScannerResponse> resp) {
+      .thenValue([this, self](std::shared_ptr<OpenScannerResponse> resp) {
         VLOG(3) << "Opened scanner with id:" << resp->scan_resp_->scanner_id()
                 << ", region:" << resp->region_location_->DebugString() << ", starting scan";
         StartScan(resp);
       })
-      .onError([this, self](const folly::exception_wrapper& e) {
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[this,self](const folly::exception_wrapper &e) {
         VLOG(3) << "Open scan request received error:" << e.what();
         consumer_->OnError(e);
       })
-      .then([caller, self](const auto r) { return r; });
+      .thenValue([caller, self](const auto r) { return r; });
 }
 
 void AsyncClientScanner::StartScan(std::shared_ptr<OpenScannerResponse> resp) {
@@ -119,7 +119,7 @@ void AsyncClientScanner::StartScan(std::shared_ptr<OpenScannerResponse> resp) {
                     ->Build();
 
   caller->Start(resp->controller_, resp->scan_resp_, resp->cell_scanner_)
-      .then([caller, self](const bool has_more) {
+      .thenValue([caller, self](const bool has_more) {
         if (has_more) {
           // open the next scanner on the next region.
           self->OpenScanner();
@@ -127,8 +127,8 @@ void AsyncClientScanner::StartScan(std::shared_ptr<OpenScannerResponse> resp) {
           self->consumer_->OnComplete();
         }
       })
-      .onError([caller, self](const folly::exception_wrapper& e) { self->consumer_->OnError(e); })
-      .then([caller, self](const auto r) { return r; });
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[caller, self](const folly::exception_wrapper& e) { self->consumer_->OnError(e); })
+      .thenValue([caller, self](const auto r) { return r; });
 }
 
 RegionLocateType AsyncClientScanner::GetLocateType(const Scan& scan) {

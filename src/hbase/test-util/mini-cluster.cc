@@ -238,7 +238,6 @@ jobject MiniCluster::CreateTable(const string &table, const vector<string> &fami
   for (const auto& key : keys) {
     env_->SetObjectArrayElement(key_array, i++, StrToByteChar(key));
   }
-
   jobject tbl = env_->CallObjectMethod(htu_, create_table_with_split_mid_, table_name, family_array,
                                        key_array);
   return tbl;

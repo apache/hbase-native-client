@@ -23,7 +23,11 @@ set(Boost_INCLUDE_DIR "${BOOST_ROOT}/include" CACHE STRING "" FORCE)
 set(Boost_LIBRARIES "" CACHE STRING "" FORCE)
 foreach(COMPONENT ${Boost_FIND_COMPONENTS})
   list(APPEND Boost_LIBRARIES "${BOOST_ROOT}/lib/${BYPRODUCT_PREFIX}boost_${COMPONENT}${BYPRODUCT_SUFFIX}")
+  set(Boost_${COMPONENT} "${BOOST_ROOT}/lib/${BYPRODUCT_PREFIX}boost_${COMPONENT}${BYPRODUCT_SUFFIX}" CACHE STRING "" FORCE)
+  message(STATUS "Found Boost_${COMPONENT} at ${BOOST_ROOT}/lib/${BYPRODUCT_PREFIX}boost_${COMPONENT}${BYPRODUCT_SUFFIX}" )
 endforeach()
+
+set(Boost_LIBRARIES "${Boost_LIBRARIES}" CACHE STRING "" FORCE)
 
 set(Boost_FOUND "true" CACHE STRING "" FORCE)
 
@@ -33,4 +37,4 @@ mark_as_advanced(
     Boost_INCLUDE_DIRS
     Boost_LIBRARIES
 )
-message("-- Boost found, ${Boost_LIBRARIES}")
+message(STATUS "Boost found, ${Boost_LIBRARIES}")

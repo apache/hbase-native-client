@@ -19,7 +19,7 @@
 
 #include "hbase/utils/user-util.h"
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <krb5/krb5.h>
 #include <pwd.h>
 #include <sys/types.h>
