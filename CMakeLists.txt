@@ -85,11 +85,9 @@ if (DOWNLOAD_DEPENDENCIES)
   set(PROTOBUF_PROTOC_EXECUTABLE "${Protobuf_BINARY_DIR}/bin/protoc" CACHE STRING "" FORCE)
   ## Add CMAKE_MODULE_PATHS
 
-if(NOT APPLE)
-    if(NOT WIN32)
+if(LINUX)
     set(WHOLE_ARCHIVE "-Wl,--whole-archive")
     set(NO_WHOLE_ARCHIVE "-Wl,--no-whole-archive")
-  endif()
 endif()
 	
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local")
