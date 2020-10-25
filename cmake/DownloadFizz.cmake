@@ -20,7 +20,6 @@
 ## BINARY_DIR is the build directory, typically 'build'
 
 function(download_fizz SOURCE_DIR BUILD_DIR)
-
   ExternalProject_Add(
     facebook-fizz-proj
     GIT_REPOSITORY "https://github.com/facebookincubator/fizz.git"
@@ -32,10 +31,7 @@ function(download_fizz SOURCE_DIR BUILD_DIR)
       COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/cmake/boost/local/FindBoost.cmake" ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz/cmake
       COMMAND patch ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz/CMakeLists.txt "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/fizz.v2020.05.18.00.cmake" 
     INSTALL_DIR "${BUILD_DIR}/dependencies/facebook-fizz-proj-install"
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR} -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX} -DBYPRODUCT_SUFFIX=${BYPRODUCT_SUFFIX} -DCMAKE_INSTALL_PREFIX:PATH=${BUILD_DIR}/dependencies/facebook-fizz-proj-install ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz # Tell CMake to use subdirectory as source.
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DBUILD_EXAMPLES=OFF -DCMAKE_CROSSCOMPILING=ON -DBUILD_TESTS=OFF -DBOOST_ROOT=${BOOST_ROOT} -DFOLLY_ROOT_DIR=${FOLLY_ROOT_DIR} -DDOUBLE_CONVERSION_ROOT_DIR=${DOUBLE_CONVERSION_ROOT_DIR} -DBYPRODUCT_PREFIX=${BYPRODUCT_PREFIX} -DBYPRODUCT_SUFFIX=${BYPRODUCT_SUFFIX} -DCMAKE_INSTALL_PREFIX:PATH=${BUILD_DIR}/dependencies/facebook-fizz-proj-install ${BUILD_DIR}/dependencies/facebook-fizz-proj-src/fizz # Tell CMake to use subdirectory as source.
   )
-
-
   set(FIZZ_ROOT_DIR "${BUILD_DIR}/dependencies/facebook-fizz-proj-install" CACHE STRING "" FORCE)
-	
-endfunction(download_fizz) 
+endfunction(download_fizz)
