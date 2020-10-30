@@ -151,7 +151,7 @@ optional<Configuration> HBaseConfigurationLoader::LoadResources(
   if (success) {
     return Configuration(conf_property);
   } else {
-    return none;
+    return optional<Configuration>();
   }
 }
 
@@ -174,8 +174,8 @@ bool HBaseConfigurationLoader::LoadProperties(const std::string &file, ConfigMap
         std::string name_node = v.second.get<std::string>("name");
         std::string value_node = v.second.get<std::string>("value");
         if ((name_node.size() > 0) && (value_node.size() > 0)) {
-          boost::optional<std::string> final_node = v.second.get_optional<std::string>("final");
-          UpdateMapWithValue(property_map, name_node, value_node, final_node);
+          auto final_node = v.second.get_optional<std::string>("final");
+          UpdateMapWithValue(property_map, name_node, value_node, final_node.get());
         }
       }
     }
@@ -188,16 +188,16 @@ bool HBaseConfigurationLoader::LoadProperties(const std::string &file, ConfigMap
 
 bool HBaseConfigurationLoader::UpdateMapWithValue(ConfigMap &map, const std::string &key,
                                                   const std::string &value,
-                                                  boost::optional<std::string> final_text) {
+                                                  optional<std::string> final_text) {
   auto map_value = map.find(key);
   if (map_value != map.end() && map_value->second.final) {
     return false;
   }
 
   bool final_value = false;
-  if (nullptr != final_text.get_ptr()) {
-    if (is_valid_bool(final_text.get())) {
-      final_value = str_to_bool(final_text.get());
+  if (final_text) {
+    if (is_valid_bool(final_text.value())) {
+      final_value = str_to_bool(final_text.value());
     }
   }
 

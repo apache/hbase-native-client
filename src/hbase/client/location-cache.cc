@@ -19,10 +19,10 @@
 #include "hbase/client/location-cache.h"
 
 #include <folly/Conv.h>
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <folly/io/IOBuf.h>
-#include <wangle/concurrent/CPUThreadPoolExecutor.h>
-#include <wangle/concurrent/IOThreadPoolExecutor.h>
+#include <folly/executors/CPUThreadPoolExecutor.h>
+#include <folly/executors/IOThreadPoolExecutor.h>
 
 #include <map>
 #include <shared_mutex>
@@ -45,8 +45,8 @@ using hbase::pb::TableName;
 namespace hbase {
 
 LocationCache::LocationCache(std::shared_ptr<hbase::Configuration> conf,
-                             std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                             std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+                             std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                             std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                              std::shared_ptr<ConnectionPool> cp)
     : conf_(conf),
       io_executor_(io_executor),
@@ -85,7 +85,7 @@ folly::Future<ServerName> LocationCache::LocateMeta() {
   if (meta_promise_ == nullptr) {
     this->RefreshMetaLocation();
   }
-  return meta_promise_->getFuture().onError([&](const folly::exception_wrapper &ew) {
+  return meta_promise_->getFuture().thenError(folly::tag_t<folly::exception_wrapper>{},[&](const folly::exception_wrapper &ew) {
     auto promise = InvalidateMeta();
     if (promise) {
       promise->setException(ew);
@@ -149,25 +149,25 @@ folly::Future<std::shared_ptr<RegionLocation>> LocationCache::LocateFromMeta(
     const TableName &tn, const std::string &row) {
   return this->LocateMeta()
       .via(cpu_executor_.get())
-      .then([this](ServerName sn) {
+      .thenValue([this](ServerName sn) {
         // TODO: use RpcClient?
         auto remote_id = std::make_shared<ConnectionId>(sn.host_name(), sn.port());
         return this->cp_->GetConnection(remote_id);
       })
-      .then([tn, row, this](std::shared_ptr<RpcConnection> rpc_connection) {
+      .thenValue([tn, row, this](std::shared_ptr<RpcConnection> rpc_connection) {
         return rpc_connection->SendRequest(std::move(meta_util_.MetaRequest(tn, row)));
       })
-      .onError([&](const folly::exception_wrapper &ew) {
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[&](const folly::exception_wrapper &ew) {
         auto promise = InvalidateMeta();
         throw ew;
         return static_cast<std::unique_ptr<Response>>(nullptr);
       })
-      .then([tn, this](std::unique_ptr<Response> resp) {
+      .thenValue([tn, this](std::unique_ptr<Response> resp) {
         // take the protobuf response and make it into
         // a region location.
         return meta_util_.CreateLocation(std::move(*resp), tn);
       })
-      .then([tn, this](std::shared_ptr<RegionLocation> rl) {
+      .thenValue([tn, this](std::shared_ptr<RegionLocation> rl) {
         // Make sure that the correct location was found.
         if (rl->region_info().table_name().namespace_() != tn.namespace_() ||
             rl->region_info().table_name().qualifier() != tn.qualifier()) {
@@ -175,12 +175,12 @@ folly::Future<std::shared_ptr<RegionLocation>> LocationCache::LocateFromMeta(
         }
         return rl;
       })
-      .then([this](std::shared_ptr<RegionLocation> rl) {
+      .thenValue([this](std::shared_ptr<RegionLocation> rl) {
         auto remote_id =
             std::make_shared<ConnectionId>(rl->server_name().host_name(), rl->server_name().port());
         return rl;
       })
-      .then([tn, this](std::shared_ptr<RegionLocation> rl) {
+      .thenValue([tn, this](std::shared_ptr<RegionLocation> rl) {
         // now add fetched location to the cache.
         this->CacheLocation(tn, rl);
         return rl;
@@ -194,7 +194,7 @@ folly::Future<std::shared_ptr<RegionLocation>> LocationCache::LocateRegion(
     const int64_t locate_ns) {
   // We maybe asked to locate meta itself
   if (MetaUtil::IsMeta(tn)) {
-    return LocateMeta().then([this](const ServerName &server_name) {
+    return LocateMeta().thenValue([this](const ServerName &server_name) {
       auto rl = std::make_shared<RegionLocation>(MetaUtil::kMetaRegionName,
                                                  meta_util_.meta_region_info(), server_name);
       return rl;

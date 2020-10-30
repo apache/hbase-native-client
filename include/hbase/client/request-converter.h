@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <folly/logging/Logger.h>
 #include "hbase/connection/request.h"
 #include "hbase/client/action.h"
 #include "hbase/client/append.h"

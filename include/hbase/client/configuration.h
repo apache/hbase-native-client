@@ -28,8 +28,6 @@
 
 namespace hbase {
 
-template <class T>
-using optional = boost::optional<T>;
 
 class Configuration {
  public:

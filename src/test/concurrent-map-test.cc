@@ -17,7 +17,8 @@
  *
  */
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
+#include <gtest/gtest.h>
 #include <string>
 
 #include "hbase/test-util/test-util.h"

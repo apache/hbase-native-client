@@ -27,14 +27,14 @@ void AsyncConnectionImpl::Init() {
   // start thread pools
   auto io_threads = conf_->GetInt(kClientIoThreadPoolSize, sysconf(_SC_NPROCESSORS_ONLN));
   auto cpu_threads = conf_->GetInt(kClientCpuThreadPoolSize, 2 * sysconf(_SC_NPROCESSORS_ONLN));
-  cpu_executor_ = std::make_shared<wangle::CPUThreadPoolExecutor>(cpu_threads);
-  io_executor_ = std::make_shared<wangle::IOThreadPoolExecutor>(io_threads);
+  cpu_executor_ = std::make_shared<folly::CPUThreadPoolExecutor>(cpu_threads);
+  io_executor_ = std::make_shared<folly::IOThreadPoolExecutor>(io_threads);
   /*
    * We need a retry_executor for a thread pool of size 1 due to a possible bug in wangle/folly.
    * Otherwise, Assertion 'isInEventBaseThread()' always fails. See the comments
    * in async-rpc-retrying-caller.cc.
    */
-  retry_executor_ = std::make_shared<wangle::IOThreadPoolExecutor>(1);
+  retry_executor_ = std::make_shared<folly::IOThreadPoolExecutor>(1);
   retry_timer_ = folly::HHWheelTimer::newTimer(retry_executor_->getEventBase());
 
   std::shared_ptr<Codec> codec = nullptr;

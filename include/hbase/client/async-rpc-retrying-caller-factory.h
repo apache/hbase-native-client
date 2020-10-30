@@ -18,7 +18,6 @@
  */
 #pragma once
 
-#include <folly/Logging.h>
 #include <folly/io/async/EventBase.h>
 #include <chrono>
 #include <memory>

@@ -407,11 +407,11 @@ void AsyncScanRpcRetryingCaller::Call() {
                   region_location_->server_name().port(), std::move(req),
                   security::User::defaultUser(), "ClientService")
       .via(conn_->cpu_executor().get())
-      .then([self, this](const std::unique_ptr<Response>& resp) {
+      .thenValue([self, this](const std::unique_ptr<Response>& resp) {
         auto scan_resp = std::static_pointer_cast<pb::ScanResponse>(resp->resp_msg());
         return OnComplete(controller_, scan_resp, resp->cell_scanner());
       })
-      .onError([self, this](const folly::exception_wrapper& e) { OnError(e); });
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[self, this](const folly::exception_wrapper& e) { OnError(e); });
 }
 
 void AsyncScanRpcRetryingCaller::CloseScanner() {
@@ -426,7 +426,7 @@ void AsyncScanRpcRetryingCaller::CloseScanner() {
       ->AsyncCall(region_location_->server_name().host_name(),
                   region_location_->server_name().port(), std::move(req),
                   security::User::defaultUser(), "ClientService")
-      .onError([self, this](const folly::exception_wrapper& e) -> std::unique_ptr<Response> {
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[self, this](const folly::exception_wrapper& e) -> std::unique_ptr<Response> {
         LOG(WARNING) << "Call to " + region_location_->server_name().ShortDebugString() +
                             " for closing scanner_id = " + folly::to<std::string>(scanner_id_) +
                             " for " + region_location_->region_info().ShortDebugString() +

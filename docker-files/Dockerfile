@@ -30,30 +30,25 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 RUN apt-get update && \
     apt-get install -y vim maven inetutils-ping python-pip doxygen graphviz clang-format valgrind \
         wget libgflags-dev libgoogle-glog-dev dh-autoreconf pkg-config libssl-dev build-essential \
-        libevent-dev cmake libkrb5-dev git openjdk-8-jdk curl unzip google-mock libsodium-dev libdouble-conversion-dev && \
+        libevent-dev cmake libkrb5-dev git openjdk-8-jdk curl unzip google-mock libsodium-dev && \
     pip install yapf && \
     apt-get -qq clean && \
     apt-get -y -qq autoremove && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
     rm -rf /tmp/*
 
-RUN wget https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.26/cyrus-sasl-2.1.26.tar.gz ; \
-    tar zxf cyrus-sasl-2.1.26.tar.gz ; \
-    cd cyrus-sasl-2.1.26 ; \
-    ./configure ; \
-    make -j4; \
-    make install ;\
-    cp /usr/local/lib/sasl2/* /usr/lib/sasl2/
-
 ## Install Google Test to support 
 RUN wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz && \
   	tar zxf release-1.8.0.tar.gz && \
   	rm -f release-1.8.0.tar.gz && \
   	mv googletest-release-1.8.0 gtest && \
-  	cd gtest && \
-  	cmake . && \
-  	make -j4 && \
- 	make install
+	cd gtest && cmake . && make -j4 && make install
+
+## xenial has no libfmt-dev package in apt
+RUN wget https://github.com/fmtlib/fmt/archive/7.0.0.tar.gz && \
+	tar zxf 7.0.0.tar.gz && rm -f 7.0.0.tar.gz && \
+	cd fmt-7.0.0 && \
+	cmake . -DCMAKE_BUILD_TYPE=Release -DFMT_TEST=OFF && make -j4 && make install
 
 RUN apt-get update && \
     apt-get install -y debconf-utils && \

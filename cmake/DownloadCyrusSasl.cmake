@@ -1,5 +1,4 @@
 # Licensed to the Apache Software Foundation (ASF) under one
-#
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
 # regarding copyright ownership.  The ASF licenses this file
@@ -15,35 +14,21 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-#
-find_path(KRB5_ROOT_DIR
-    NAMES include/krb5/krb5.h
-)
-find_library(GSSAPI_KRB5_LIBRARY gssapi_krb5)
 
-find_library(KRB5_LIBRARIES
-    NAMES krb5
-    HINTS ${KRB5_ROOT_DIR}/lib
-)
+## Download Cyrus SASL
+## SOURCE_DIR is typically the cmake source directory
+## BINARY_DIR is the build directory, typically 'build'
 
-find_library(GSSAPI_KRB5_LIBRARY gssapi_krb5)
-
-find_path(KRB5_INCLUDE_DIR
-    NAMES krb5/krb5.h
-    HINTS ${KRB5_ROOT_DIR}/include
-)
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(krb5 DEFAULT_MSG
-    KRB5_LIBRARIES
-    KRB5_INCLUDE_DIR
-)
-set(KRB5_LIBRARIES "${KRB5_LIBRARIES}" "${GSSAPI_KRB5_LIBRARY}")
-if (KRB5_LIBRARIES)
-   set(KRB5_FOUND "true")
-   message(STATUS "KRB5 Libs Found, ${KRB5_LIBRARIES}")
-endif()
-mark_as_advanced(
-    KRB5_ROOT_DIR
-    KRB5_LIBRARIES
-    KRB5_INCLUDE_DIR
-)
+function(download_cyrus_sasl SOURCE_DIR BUILD_DIR)
+  ExternalProject_Add(
+    cyrussasl
+    URL "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+    PREFIX "${BUILD_DIR}/dependencies"
+    SOURCE_DIR "${BUILD_DIR}/dependencies/cyrussasl-src"
+    BINARY_DIR ${BUILD_DIR}/dependencies/cyrussasl-src/
+    CONFIGURE_COMMAND ./configure --enable-static --with-pic --prefix=${BUILD_DIR}/dependencies/cyrussasl-install
+      "CFLAGS=-fPIC"
+      "CXXFLAGS=${CMAKE_CXX_FLAGS} -fPIC"
+  )
+  set(SASL2_DIR "${BUILD_DIR}/dependencies/cyrussasl-install/" CACHE STRING "" FORCE)
+endfunction(download_cyrus_sasl)
