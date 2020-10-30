@@ -42,10 +42,13 @@ RUN wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz && \
   	tar zxf release-1.8.0.tar.gz && \
   	rm -f release-1.8.0.tar.gz && \
   	mv googletest-release-1.8.0 gtest && \
-  	cd gtest && \
-  	cmake . && \
-  	make -j4 && \
- 	make install
+	cd gtest && cmake . && make -j4 && make install
+
+## xenial has no libfmt-dev package in apt
+RUN wget https://github.com/fmtlib/fmt/archive/7.0.0.tar.gz && \
+	tar zxf 7.0.0.tar.gz && rm -f 7.0.0.tar.gz && \
+	cd fmt-7.0.0 && \
+	cmake . -DCMAKE_BUILD_TYPE=Release -DFMT_TEST=OFF && make -j4 && make install
 
 RUN apt-get update && \
     apt-get install -y debconf-utils && \
