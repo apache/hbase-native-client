@@ -38,7 +38,7 @@ function(download_boost SOURCE_DIR BUILD_DIR BOOST_LIBS)
     "./b2 cflags='${CFLAGS}' cxxflags='${CXXFLAGS}' variant=release link=static threading=multi ${LIBS_TO_COMPILE} install")
 
   ExternalProject_Add(boost
-     URL "https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz"
+     URL "https://boostorg.jfrog.io/artifactory/main/release/1.65.1/source/boost_1_65_1.tar.gz"
      PREFIX "${BUILD_DIR}/dependencies"
      DOWNLOAD_DIR ${BOOST_DOWNLOAD_DIR}
      BUILD_IN_SOURCE true
