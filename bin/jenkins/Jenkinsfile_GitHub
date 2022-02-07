@@ -54,7 +54,7 @@ pipeline {
                 stage ('yetus patch ctests') {
                     agent {
                         node {
-                            label 'Hadoop'
+                            label 'hbase'
                         }
                     }
                     environment {
