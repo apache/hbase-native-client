@@ -17,12 +17,13 @@
  *
  */
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <folly/Memory.h>
 #include <folly/futures/Future.h>
 #include <folly/io/async/EventBase.h>
 #include <folly/io/async/ScopedEventBaseThread.h>
-#include <wangle/concurrent/IOThreadPoolExecutor.h>
+#include <gtest/gtest.h>
+#include <folly/executors/IOThreadPoolExecutor.h>
 
 #include <chrono>
 #include <functional>
@@ -204,9 +205,9 @@ class MockAsyncConnection : public AsyncConnection,
  public:
   MockAsyncConnection(std::shared_ptr<ConnectionConfiguration> conn_conf,
                       std::shared_ptr<folly::HHWheelTimer> retry_timer,
-                      std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
-                      std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                      std::shared_ptr<wangle::IOThreadPoolExecutor> retry_executor,
+                      std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
+                      std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                      std::shared_ptr<folly::IOThreadPoolExecutor> retry_executor,
                       std::shared_ptr<RpcClient> rpc_client,
                       std::shared_ptr<AsyncRegionLocator> region_locator)
       : conn_conf_(conn_conf),
@@ -229,9 +230,9 @@ class MockAsyncConnection : public AsyncConnection,
   }
   std::shared_ptr<RpcClient> rpc_client() override { return rpc_client_; }
   std::shared_ptr<AsyncRegionLocator> region_locator() override { return region_locator_; }
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor() override { return cpu_executor_; }
-  std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor() override { return io_executor_; }
-  std::shared_ptr<wangle::IOThreadPoolExecutor> retry_executor() override {
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor() override { return cpu_executor_; }
+  std::shared_ptr<folly::IOThreadPoolExecutor> io_executor() override { return io_executor_; }
+  std::shared_ptr<folly::IOThreadPoolExecutor> retry_executor() override {
     return retry_executor_;
   }
 
@@ -251,9 +252,9 @@ class MockAsyncConnection : public AsyncConnection,
   std::shared_ptr<AsyncRpcRetryingCallerFactory> caller_factory_;
   std::shared_ptr<RpcClient> rpc_client_;
   std::shared_ptr<AsyncRegionLocator> region_locator_;
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor_;
-  std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor_;
-  std::shared_ptr<wangle::IOThreadPoolExecutor> retry_executor_;
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor_;
+  std::shared_ptr<folly::IOThreadPoolExecutor> io_executor_;
+  std::shared_ptr<folly::IOThreadPoolExecutor> retry_executor_;
 };
 
 class MockRawAsyncTableImpl {
@@ -292,9 +293,9 @@ std::shared_ptr<MockAsyncConnection> getAsyncConnection(
     Client &client, uint32_t operation_timeout_millis, uint32_t tries,
     std::shared_ptr<AsyncRegionLocatorBase> region_locator) {
   /* init region location and rpc channel */
-  auto cpu_executor_ = std::make_shared<wangle::CPUThreadPoolExecutor>(4);
+  auto cpu_executor_ = std::make_shared<folly::CPUThreadPoolExecutor>(4);
   auto io_executor_ = client.async_connection()->io_executor();
-  auto retry_executor_ = std::make_shared<wangle::IOThreadPoolExecutor>(1);
+  auto retry_executor_ = std::make_shared<folly::IOThreadPoolExecutor>(1);
   auto codec = std::make_shared<hbase::KeyValueCodec>();
   auto rpc_client = std::make_shared<RpcClient>(io_executor_, cpu_executor_, codec,
                                                 AsyncBatchRpcRetryTest::test_util->conf());

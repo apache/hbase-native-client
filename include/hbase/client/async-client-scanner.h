@@ -19,7 +19,6 @@
 #pragma once
 
 #include <folly/Format.h>
-#include <folly/Logging.h>
 #include <folly/futures/Future.h>
 #include <folly/io/async/EventBase.h>
 #include <folly/io/async/HHWheelTimer.h>

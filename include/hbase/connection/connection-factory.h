@@ -18,8 +18,8 @@
  */
 #pragma once
 
-#include <wangle/concurrent/CPUThreadPoolExecutor.h>
-#include <wangle/concurrent/IOThreadPoolExecutor.h>
+#include <folly/executors/CPUThreadPoolExecutor.h>
+#include <folly/executors/IOThreadPoolExecutor.h>
 #include <wangle/service/Service.h>
 
 #include <chrono>
@@ -46,8 +46,8 @@ class ConnectionFactory {
    * Constructor.
    * There should only be one ConnectionFactory per client.
    */
-  ConnectionFactory(std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                    std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+  ConnectionFactory(std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                    std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                     std::shared_ptr<Codec> codec, std::shared_ptr<Configuration> conf,
                     std::chrono::nanoseconds connect_timeout = std::chrono::nanoseconds(0));
 
@@ -69,15 +69,15 @@ class ConnectionFactory {
       std::shared_ptr<wangle::ClientBootstrap<SerializePipeline>> client_bootstrap,
       const std::string &hostname, uint16_t port);
 
-  std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor() { return io_executor_; }
+  std::shared_ptr<folly::IOThreadPoolExecutor> io_executor() { return io_executor_; }
 
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor() { return cpu_executor_; }
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor() { return cpu_executor_; }
 
  private:
   std::chrono::nanoseconds connect_timeout_;
   std::shared_ptr<Configuration> conf_;
-  std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor_;
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor_;
+  std::shared_ptr<folly::IOThreadPoolExecutor> io_executor_;
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor_;
   std::shared_ptr<RpcPipelineFactory> pipeline_factory_;
 };
 }  // namespace hbase

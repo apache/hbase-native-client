@@ -23,9 +23,9 @@
 #include <stdexcept>
 #include <utility>
 
+#include <glog/logging.h>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include <glog/logging.h>
 
 namespace hbase {
 
@@ -161,7 +161,7 @@ optional<int32_t> Configuration::GetInt(const std::string &key) const {
       throw std::runtime_error(blex.what());
     }
   }
-  return none;
+  return optional<int32_t>();
 }
 
 int32_t Configuration::GetInt(const std::string &key, int32_t default_value) const {
@@ -177,7 +177,7 @@ optional<int64_t> Configuration::GetLong(const std::string &key) const {
       throw std::runtime_error(blex.what());
     }
   }
-  return none;
+  return optional<int64_t>();
 }
 
 int64_t Configuration::GetLong(const std::string &key, int64_t default_value) const {
@@ -193,7 +193,7 @@ optional<double> Configuration::GetDouble(const std::string &key) const {
       throw std::runtime_error(blex.what());
     }
   }
-  return none;
+  return optional<double>();
 }
 
 double Configuration::GetDouble(const std::string &key, double default_value) const {
@@ -214,7 +214,7 @@ optional<bool> Configuration::GetBool(const std::string &key) const {
       throw std::runtime_error(what.str());
     }
   }
-  return none;
+  return optional<bool>();
 }
 
 bool Configuration::GetBool(const std::string &key, bool default_value) const {

@@ -56,23 +56,23 @@ class LocationCacheTest : public ::testing::Test {
 std::unique_ptr<MiniClusterUtility> LocationCacheTest::test_util_ = nullptr;
 
 TEST_F(LocationCacheTest, TestGetMetaNodeContents) {
-  auto cpu = std::make_shared<wangle::CPUThreadPoolExecutor>(4);
-  auto io = std::make_shared<wangle::IOThreadPoolExecutor>(4);
+  auto cpu = std::make_shared<folly::CPUThreadPoolExecutor>(4);
+  auto io = std::make_shared<folly::IOThreadPoolExecutor>(4);
   auto codec = std::make_shared<KeyValueCodec>();
   auto cp = std::make_shared<ConnectionPool>(io, cpu, codec, LocationCacheTest::test_util_->conf());
   LocationCache cache{LocationCacheTest::test_util_->conf(), io, cpu, cp};
   auto f = cache.LocateMeta();
-  auto result = f.get();
   ASSERT_FALSE(f.hasException());
-  ASSERT_TRUE(result.has_port());
-  ASSERT_TRUE(result.has_host_name());
+  auto res = std::move(f).get();
+  ASSERT_TRUE(res.has_port());
+  ASSERT_TRUE(res.has_host_name());
   cpu->stop();
   io->stop();
 }
 
 TEST_F(LocationCacheTest, TestGetRegionLocation) {
-  auto cpu = std::make_shared<wangle::CPUThreadPoolExecutor>(4);
-  auto io = std::make_shared<wangle::IOThreadPoolExecutor>(4);
+  auto cpu = std::make_shared<folly::CPUThreadPoolExecutor>(4);
+  auto io = std::make_shared<folly::IOThreadPoolExecutor>(4);
   auto codec = std::make_shared<KeyValueCodec>();
   auto cp = std::make_shared<ConnectionPool>(io, cpu, codec, LocationCacheTest::test_util_->conf());
   LocationCache cache{LocationCacheTest::test_util_->conf(), io, cpu, cp};
@@ -89,8 +89,8 @@ TEST_F(LocationCacheTest, TestGetRegionLocation) {
 }
 
 TEST_F(LocationCacheTest, TestCaching) {
-  auto cpu = std::make_shared<wangle::CPUThreadPoolExecutor>(4);
-  auto io = std::make_shared<wangle::IOThreadPoolExecutor>(4);
+  auto cpu = std::make_shared<folly::CPUThreadPoolExecutor>(4);
+  auto io = std::make_shared<folly::IOThreadPoolExecutor>(4);
   auto codec = std::make_shared<KeyValueCodec>();
   auto cp = std::make_shared<ConnectionPool>(io, cpu, codec, LocationCacheTest::test_util_->conf());
   LocationCache cache{LocationCacheTest::test_util_->conf(), io, cpu, cp};

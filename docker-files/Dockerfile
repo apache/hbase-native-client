@@ -30,20 +30,12 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 RUN apt-get update && \
     apt-get install -y vim maven inetutils-ping python-pip doxygen graphviz clang-format valgrind \
         wget libgflags-dev libgoogle-glog-dev dh-autoreconf pkg-config libssl-dev build-essential \
-        libevent-dev cmake libkrb5-dev git openjdk-8-jdk curl unzip google-mock libsodium-dev libdouble-conversion-dev && \
+        libevent-dev cmake libkrb5-dev git openjdk-8-jdk curl unzip google-mock libsodium-dev libfmt-dev && \
     pip install yapf && \
     apt-get -qq clean && \
     apt-get -y -qq autoremove && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
     rm -rf /tmp/*
-
-RUN wget https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.26/cyrus-sasl-2.1.26.tar.gz ; \
-    tar zxf cyrus-sasl-2.1.26.tar.gz ; \
-    cd cyrus-sasl-2.1.26 ; \
-    ./configure ; \
-    make -j4; \
-    make install ;\
-    cp /usr/local/lib/sasl2/* /usr/lib/sasl2/
 
 ## Install Google Test to support 
 RUN wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz && \

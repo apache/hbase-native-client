@@ -15,19 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Stubs to allow us to find folly libs
+# Stubs to allow us to find FIZZ libs
 
-set(FOLLY_FOUND "true" CACHE STRING "" FORCE)
-set(FOLLY_INCLUDE_DIR "${FOLLY_ROOT_DIR}/include" CACHE STRING "" FORCE)
-## Given that folly is an older dependency, and the way it is built has evolved, newer
-## versions of folly won't require an SO. For now it is far easier to link against the .so (BYPRODUCT_SHARED_SUFFIX)
-set(FOLLY_LIBRARIES "${FOLLY_ROOT_DIR}/lib/${BYPRODUCT_PREFIX}folly${BYPRODUCT_SUFFIX}" CACHE STRING "" FORCE)
-
+set(FIZZ_FOUND "true" CACHE STRING "" FORCE)
+set(FIZZ_INCLUDE_DIR "${FIZZ_ROOT_DIR}/include" CACHE STRING "" FORCE)
+set(FIZZ_LIBRARIES "${FIZZ_ROOT_DIR}/lib/${BYPRODUCT_PREFIX}fizz${BYPRODUCT_SUFFIX}" CACHE STRING "" FORCE)
 
 
 mark_as_advanced(
-    FOLLY_ROOT_DIR
-    FOLLY_INCLUDE_DIR
-    FOLLY_LIBRARIES
+    FIZZ_ROOT_DIR
+    FIZZ_LIBRARIES
+    FIZZ_BENCHMARK_LIBRARIES
+    FIZZ_INCLUDE_DIR
 )
-message(STATUS "FOLLY found, ${FOLLY_LIBRARIES}")
+message(STATUS "Fizz found, ${FIZZ_LIBRARIES}")

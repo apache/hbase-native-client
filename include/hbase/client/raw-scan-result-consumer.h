@@ -19,7 +19,6 @@
 #pragma once
 
 #include <folly/ExceptionWrapper.h>
-#include <folly/Logging.h>
 #include <chrono>
 #include <memory>
 #include <string>

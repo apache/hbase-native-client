@@ -69,8 +69,8 @@ class RpcConnection : public std::enable_shared_from_this<RpcConnection> {
 
  private:
   std::recursive_mutex mutex_;
-  std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor_;
-  std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor_;
+  std::shared_ptr<folly::IOThreadPoolExecutor> io_executor_;
+  std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor_;
   std::shared_ptr<ConnectionId> connection_id_;
   std::shared_ptr<HBaseService> hbase_service_;
   std::shared_ptr<ConnectionFactory> cf_;
