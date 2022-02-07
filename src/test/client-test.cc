@@ -207,7 +207,7 @@ TEST_F(ClientTest, PutGetDelete) {
   result = table->Get(get);
   ASSERT_TRUE(!result->IsEmpty()) << "Result shouldn't be empty.";
   ASSERT_FALSE(result->Value("d", "1")) << "Column 1 should be gone";
-  ASSERT_TRUE(result->Value("d", "extra") != none) << "Column extra should have value";
+  ASSERT_TRUE(result->Value("d", "extra")) << "Column extra should have value";
   EXPECT_EQ(valExt, *(result->Value("d", "ext"))) << "Column ext should have value";
 
   // delete all cells from "extra" column

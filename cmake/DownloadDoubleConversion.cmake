@@ -5,9 +5,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -15,19 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Stubs to allow us to find folly libs
+## Download Double Conversion library. 
+## SOURCE_DIR is typically the cmake source directory
+function(download_doubleconversion SOURCE_DIR BUILD_DIR)
 
-set(FOLLY_FOUND "true" CACHE STRING "" FORCE)
-set(FOLLY_INCLUDE_DIR "${FOLLY_ROOT_DIR}/include" CACHE STRING "" FORCE)
-## Given that folly is an older dependency, and the way it is built has evolved, newer
-## versions of folly won't require an SO. For now it is far easier to link against the .so (BYPRODUCT_SHARED_SUFFIX)
-set(FOLLY_LIBRARIES "${FOLLY_ROOT_DIR}/lib/${BYPRODUCT_PREFIX}folly${BYPRODUCT_SUFFIX}" CACHE STRING "" FORCE)
+  ExternalProject_Add(
+    doubleconversion-proj
+    PREFIX "${BUILD_DIR}/dependencies"
+    GIT_REPOSITORY "https://github.com/google/double-conversion.git"
+    GIT_TAG "b1d531bfb130e7149ffe24bb0f1c5c01f20c3a5f" ## Commit hash from master
+    SOURCE_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-src"
+    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${BUILD_DIR}/dependencies/doubleconversion-proj-install" -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${BUILD_ARGS}")
 
-
-
-mark_as_advanced(
-    FOLLY_ROOT_DIR
-    FOLLY_INCLUDE_DIR
-    FOLLY_LIBRARIES
-)
-message(STATUS "FOLLY found, ${FOLLY_LIBRARIES}")
+  set(DOUBLE_CONVERSION_ROOT_DIR "${BUILD_DIR}/dependencies/doubleconversion-proj-install" CACHE STRING "" FORCE)
+endfunction(download_doubleconversion) 

@@ -42,8 +42,8 @@ namespace hbase {
 class ConnectionPool {
  public:
   /** Create connection pool wit default connection factory */
-  ConnectionPool(std::shared_ptr<wangle::IOThreadPoolExecutor> io_executor,
-                 std::shared_ptr<wangle::CPUThreadPoolExecutor> cpu_executor,
+  ConnectionPool(std::shared_ptr<folly::IOThreadPoolExecutor> io_executor,
+                 std::shared_ptr<folly::CPUThreadPoolExecutor> cpu_executor,
                  std::shared_ptr<Codec> codec, std::shared_ptr<Configuration> conf,
                  std::chrono::nanoseconds connect_timeout = std::chrono::nanoseconds(0));
 

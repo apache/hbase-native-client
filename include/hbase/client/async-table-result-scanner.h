@@ -20,7 +20,7 @@
 
 #include <folly/Conv.h>
 #include <folly/ExceptionWrapper.h>
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <chrono>
 #include <condition_variable>
 #include <memory>

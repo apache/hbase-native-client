@@ -18,9 +18,8 @@
  */
 
 #pragma once
-
-#include <boost/optional.hpp>
 #include <boost/none.hpp>
+#include <boost/optional.hpp>
 
 namespace hbase {
 

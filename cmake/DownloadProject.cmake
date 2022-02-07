@@ -110,7 +110,6 @@ set(_DownloadProjectDir "${CMAKE_CURRENT_LIST_DIR}")
 include(CMakeParseArguments)
 
 function(download_project)
-
     set(options QUIET IS_AUTOGEN IS_MAVEN)
     set(oneValueArgs
         PROJ
@@ -188,8 +187,7 @@ function(download_project)
     if(result)
     	file(REMOVE "${DL_ARGS_DOWNLOAD_DIR}/CMakeCache.txt")
         message(FATAL_ERROR "CMake step for ${DL_ARGS_PROJ} failed: ${result}")
-    endif()
-    
+    endif()   
         execute_process(COMMAND ${CMAKE_COMMAND} --build .
                         RESULT_VARIABLE result
                         ${OUTPUT_QUIET}

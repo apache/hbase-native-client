@@ -22,7 +22,7 @@
 #include <folly/Conv.h>
 #include <folly/ExceptionWrapper.h>
 #include <folly/Format.h>
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <folly/Unit.h>
 
 #include "hbase/connection/rpc-client.h"
@@ -91,8 +91,8 @@ void AsyncSingleRequestRpcRetryingCaller<RESP>::LocateThenCall() {
 
   conn_->region_locator()
       ->LocateRegion(*table_name_, row_, locate_type_, locate_timeout_ns)
-      .then([this](std::shared_ptr<RegionLocation> loc) { Call(*loc); })
-      .onError([this](const exception_wrapper& e) {
+      .thenValue([this](std::shared_ptr<RegionLocation> loc) { Call(*loc); })
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[this](const exception_wrapper& e) {
         OnError(e,
                 [this, e]() -> std::string {
                   return "Locate '" + row_ + "' in " + table_name_->namespace_() + "::" +
@@ -179,8 +179,8 @@ void AsyncSingleRequestRpcRetryingCaller<RESP>::Call(const RegionLocation& loc) 
   // Otherwise, it may get deleted underneat us. We are just copying for now.
   auto loc_ptr = std::make_shared<RegionLocation>(loc);
   callable_(controller_, loc_ptr, rpc_client)
-      .then([loc_ptr, this](const RESP& resp) { this->promise_->setValue(std::move(resp)); })
-      .onError([&, loc_ptr, this](const exception_wrapper& e) {
+      .thenValue([loc_ptr, this](const RESP& resp) { this->promise_->setValue(std::move(resp)); })
+      .thenError(folly::tag_t<folly::exception_wrapper>{},[&, loc_ptr, this](const exception_wrapper& e) {
         OnError(
             e,
             [&, this, e]() -> std::string {

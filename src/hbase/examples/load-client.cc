@@ -17,7 +17,7 @@
  *
  */
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <folly/Random.h>
 #include <gflags/gflags.h>
 

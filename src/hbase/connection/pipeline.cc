@@ -18,7 +18,7 @@
  */
 #include "hbase/connection/pipeline.h"
 
-#include <folly/Logging.h>
+#include <folly/logging/Logger.h>
 #include <wangle/channel/AsyncSocketHandler.h>
 #include <wangle/channel/EventBaseHandler.h>
 #include <wangle/channel/OutputBufferingHandler.h>
